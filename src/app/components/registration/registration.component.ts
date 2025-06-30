@@ -19,9 +19,9 @@ export class RegistrationComponent {
   }
 
   get isFormValid(): boolean {
-    return this.email.length > 0 && 
-           this.password.length > 0 && 
-           this.confirmPassword.length > 0 && 
+    return this.email.trim().length > 0 && 
+           this.password.trim().length > 0 && 
+           this.confirmPassword.trim().length > 0 && 
            this.passwordsMatch;
   }
 

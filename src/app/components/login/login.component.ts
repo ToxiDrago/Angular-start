@@ -14,7 +14,7 @@ export class LoginComponent {
   password: string = '';
 
   get isFormValid(): boolean {
-    return this.login.length > 0 && this.password.length > 0;
+    return this.login.trim().length > 0 && this.password.trim().length > 0;
   }
 
   onSubmit() {
