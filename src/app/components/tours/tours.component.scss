@@ -1,0 +1,348 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.tours-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: $spacing-lg 0;
+  @include fade-in;
+
+  .container {
+    @include container;
+  }
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: $spacing-2xl;
+  
+  .page-title {
+    @include page-title;
+    background: $primary-gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: $spacing-base;
+  }
+  
+  .page-description {
+    font-size: $font-size-lg;
+    color: $gray-600;
+    margin: 0;
+    font-weight: $font-weight-normal;
+  }
+}
+
+.filters-panel {
+  @include card-base;
+  margin-bottom: $spacing-xl;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  
+  .filters-header {
+    @include flex-between;
+    margin-bottom: $spacing-lg;
+    padding-bottom: $spacing-base;
+    border-bottom: 2px solid $gray-200;
+    
+    h3 {
+      @include section-title;
+      margin: 0;
+      color: $gray-800;
+    }
+  }
+  
+  .filters-content {
+    @include grid-responsive(1, 2, 4);
+    gap: $spacing-lg;
+    
+    .filter-group {
+      .form-label {
+        display: block;
+        margin-bottom: $spacing-sm;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-semibold;
+        color: $gray-700;
+      }
+      
+      .form-control {
+        @include form-control;
+        background: rgba(255, 255, 255, 0.8);
+        
+        &:focus {
+          background: $white;
+          transform: translateY(-1px);
+        }
+      }
+    }
+  }
+}
+
+.results-info {
+  margin-bottom: $spacing-lg;
+  @include flex-between;
+  
+  .loading-message {
+    @include flex-center;
+    gap: $spacing-sm;
+    color: $primary-color;
+    font-weight: $font-weight-medium;
+    
+    i {
+      font-size: $font-size-lg;
+    }
+  }
+  
+  .results-count {
+    font-size: $font-size-base;
+    color: $gray-700;
+    margin: 0;
+    
+    strong {
+      color: $primary-color;
+      font-weight: $font-weight-bold;
+    }
+  }
+}
+
+.tours-grid {
+  @include grid-responsive(1, 2, 3);
+  gap: $spacing-xl;
+  margin-bottom: $spacing-2xl;
+  
+  .tour-card {
+    @include card-base;
+    @include card-hover;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all $transition-base;
+    @include slide-up;
+    
+    &:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: $shadow-xl;
+      border-color: rgba($primary-color, 0.3);
+    }
+    
+    .tour-image {
+      position: relative;
+      height: $tour-image-height;
+      overflow: hidden;
+      border-radius: $border-radius-md $border-radius-md 0 0;
+      
+      img {
+        @include image-cover;
+        transition: transform $transition-slow;
+      }
+      
+      &:hover img {
+        transform: scale(1.1);
+      }
+      
+      .tour-type-badge {
+        position: absolute;
+        top: $spacing-sm;
+        right: $spacing-sm;
+        @include badge-base;
+        backdrop-filter: blur(10px);
+        font-weight: $font-weight-semibold;
+        
+        &.type-single {
+          background: rgba($tour-single-color, 0.9);
+          color: $white;
+        }
+        
+        &.type-multi {
+          background: rgba($tour-multi-color, 0.9);
+          color: $white;
+        }
+      }
+    }
+    
+    .tour-content {
+      padding: $spacing-lg;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-base;
+      
+      .tour-title {
+        @include card-title;
+        @include text-clamp(2);
+        margin-bottom: $spacing-sm;
+        color: $gray-900;
+        font-size: $font-size-xl;
+      }
+      
+      .tour-description {
+        @include text-clamp(3);
+        color: $gray-600;
+        font-size: $font-size-sm;
+        line-height: $line-height-relaxed;
+        flex: 1;
+        margin-bottom: $spacing-base;
+      }
+      
+      .tour-meta {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-sm;
+        margin-bottom: $spacing-base;
+        
+        .tour-operator,
+        .tour-date {
+          display: flex;
+          align-items: center;
+          gap: $spacing-sm;
+          font-size: $font-size-sm;
+          color: $gray-600;
+          font-weight: $font-weight-medium;
+          
+          i {
+            color: $primary-color;
+            font-size: $font-size-base;
+          }
+        }
+      }
+      
+      .tour-footer {
+        @include flex-between;
+        margin-top: auto;
+        padding-top: $spacing-base;
+        border-top: 2px solid $gray-200;
+        
+        .tour-price {
+          display: flex;
+          flex-direction: column;
+          
+          .price-label {
+            font-size: $font-size-xs;
+            color: $gray-500;
+            line-height: 1;
+            font-weight: $font-weight-medium;
+          }
+          
+          .price-amount {
+            font-size: $font-size-xl;
+            font-weight: $font-weight-bold;
+            color: $primary-color;
+            line-height: 1.2;
+          }
+        }
+        
+        .btn {
+          @include button-base;
+          @include button-variant($primary-color, $primary-dark);
+          font-size: $font-size-sm;
+          
+          &:hover {
+            transform: translateY(-2px);
+          }
+        }
+      }
+    }
+  }
+}
+
+.loading-placeholder {
+  @include grid-responsive(1, 2, 3);
+  gap: $spacing-xl;
+  
+  .tour-card-skeleton {
+    @include card-base;
+    padding: 0;
+    height: $tour-card-height;
+    
+    .skeleton-image {
+      @include loading-skeleton;
+      height: $tour-image-height;
+      border-radius: $border-radius-md $border-radius-md 0 0;
+    }
+    
+    .skeleton-content {
+      padding: $spacing-lg;
+      
+      .skeleton-line {
+        @include loading-skeleton;
+        height: 1.2rem;
+        margin-bottom: $spacing-base;
+        border-radius: $border-radius-sm;
+        
+        &:nth-child(1) { width: 80%; }
+        &:nth-child(2) { width: 100%; }
+        &:nth-child(3) { width: 60%; }
+        &:nth-child(4) { width: 40%; }
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+.no-results {
+  @include error-state;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: $border-radius-lg;
+  margin: $spacing-2xl 0;
+  
+  i {
+    color: $primary-color;
+    font-size: $font-size-4xl;
+  }
+  
+  h3 {
+    color: $gray-800;
+    font-size: $font-size-2xl;
+  }
+  
+  p {
+    color: $gray-600;
+    font-size: $font-size-base;
+  }
+}
+
+// Responsive adjustments
+@include respond-to(md) {
+  .tours-grid {
+    gap: $spacing-lg;
+  }
+  
+  .filters-content {
+    grid-template-columns: 1fr;
+    gap: $spacing-base;
+  }
+  
+  .page-header .page-title {
+    font-size: $font-size-2xl;
+  }
+}
+
+@include respond-to(xs) {
+  .tours-container {
+    padding: $spacing-base 0;
+  }
+  
+  .page-header {
+    margin-bottom: $spacing-lg;
+  }
+  
+  .filters-panel {
+    margin-bottom: $spacing-lg;
+  }
+  
+  .tour-card .tour-content {
+    padding: $spacing-base;
+    gap: $spacing-sm;
+  }
+}

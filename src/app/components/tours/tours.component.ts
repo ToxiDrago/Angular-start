@@ -1,9 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { ToursService, Tour, ToursResponse } from '../../shared/services/tours.service';
 import { NotificationService } from '../../shared/services/notification.service';
+
+interface FilterState {
+  searchTerm: string;
+  selectedType: string;
+  selectedOperator: string;
+  sortBy: string;
+}
 
 @Component({
   selector: 'app-tours',
@@ -12,10 +20,14 @@ import { NotificationService } from '../../shared/services/notification.service'
   templateUrl: './tours.component.html',
   styleUrls: ['./tours.component.scss']
 })
-export class ToursComponent implements OnInit {
+export class ToursComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+  private searchSubject = new Subject<string>();
+
   tours: Tour[] = [];
   filteredTours: Tour[] = [];
   loading = false;
+  error: string | null = null;
   
   searchTerm = '';
   selectedType = '';
@@ -25,54 +37,93 @@ export class ToursComponent implements OnInit {
   tourOperators: string[] = [];
   tourTypes = [
     { value: '', label: 'Все типы' },
-    { value: 'single', label: 'Одиночные' },
-    { value: 'multi', label: 'Множественные' }
+    { value: 'single', label: 'Одиночные туры' },
+    { value: 'multi', label: 'Групповые туры' }
   ];
+
+  totalTours = 0;
+  filteredCount = 0;
 
   constructor(
     private toursService: ToursService,
-    private notificationService: NotificationService
-  ) {}
+    private notificationService: NotificationService,
+    private router: Router
+  ) {
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(searchTerm => {
+      this.searchTerm = searchTerm;
+      this.applyFilters();
+    });
+  }
 
   ngOnInit(): void {
     this.loadTours();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   loadTours(): void {
     this.loading = true;
+    this.error = null;
     
     this.toursService.getTours().subscribe({
       next: (jsonString: string) => {
         try {
           const toursData: ToursResponse = this.toursService.parseToursData(jsonString);
-          this.tours = toursData.tours || [];
+          
+          if (!toursData.tours || !Array.isArray(toursData.tours)) {
+            throw new Error('Некорректный формат данных туров');
+          }
+
+          this.tours = toursData.tours;
           this.filteredTours = [...this.tours];
+          this.totalTours = this.tours.length;
+          this.filteredCount = this.filteredTours.length;
+          
           this.tourOperators = this.toursService.getTourOperators(this.tours);
           
           this.notificationService.showSuccess(
             'Туры загружены', 
             `Найдено ${this.tours.length} туров`
           );
+          
+          this.applyFilters();
+          
         } catch (error) {
           console.error('Ошибка обработки данных туров:', error);
-          this.notificationService.showError('Ошибка', 'Не удалось обработать данные туров');
+          this.error = 'Не удалось обработать данные туров';
+          this.notificationService.showError('Ошибка', this.error);
         } finally {
           this.loading = false;
         }
       },
       error: (error) => {
         console.error('Ошибка загрузки туров:', error);
-        this.notificationService.showError('Ошибка', 'Не удалось загрузить туры');
+        this.error = 'Не удалось загрузить туры. Проверьте подключение к сети.';
+        this.notificationService.showError('Ошибка сети', this.error);
         this.loading = false;
       }
     });
   }
 
+  onSearchInput(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.searchSubject.next(target.value);
+  }
+
   applyFilters(): void {
+    if (this.tours.length === 0) return;
+
     let result = [...this.tours];
 
-    if (this.searchTerm) {
-      result = this.toursService.searchTours(result, this.searchTerm);
+    if (this.searchTerm.trim()) {
+      result = this.toursService.searchTours(result, this.searchTerm.trim());
     }
 
     if (this.selectedType) {
@@ -80,18 +131,42 @@ export class ToursComponent implements OnInit {
     }
 
     if (this.selectedOperator) {
-      result = result.filter(tour => tour.tourOperator === this.selectedOperator);
+      result = result.filter(tour => 
+        tour.tourOperator === this.selectedOperator
+      );
     }
 
-    if (this.sortBy === 'price-asc') {
-      result = this.toursService.sortToursByPrice(result, true);
-    } else if (this.sortBy === 'price-desc') {
-      result = this.toursService.sortToursByPrice(result, false);
-    } else if (this.sortBy === 'name') {
-      result = result.sort((a, b) => a.name.localeCompare(b.name));
-    }
+    result = this.applySorting(result);
 
     this.filteredTours = result;
+    this.filteredCount = result.length;
+  }
+
+  private applySorting(tours: Tour[]): Tour[] {
+    switch (this.sortBy) {
+      case 'name':
+        return tours.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+      
+      case 'price-asc':
+        return this.toursService.sortToursByPrice(tours, true);
+      
+      case 'price-desc':
+        return this.toursService.sortToursByPrice(tours, false);
+      
+      case 'operator':
+        return tours.sort((a, b) => a.tourOperator.localeCompare(b.tourOperator, 'ru'));
+      
+      case 'date':
+        return tours.sort((a, b) => {
+          if (!a.date && !b.date) return 0;
+          if (!a.date) return 1;
+          if (!b.date) return -1;
+          return new Date(a.date).getTime() - new Date(b.date).getTime();
+        });
+      
+      default:
+        return tours;
+    }
   }
 
   resetFilters(): void {
@@ -100,13 +175,72 @@ export class ToursComponent implements OnInit {
     this.selectedOperator = '';
     this.sortBy = '';
     this.filteredTours = [...this.tours];
+    this.filteredCount = this.tours.length;
   }
 
-  getPriceNumber(price: string): number {
-    return parseFloat(price.replace(/[€,]/g, ''));
+  getFilterState(): FilterState {
+    return {
+      searchTerm: this.searchTerm,
+      selectedType: this.selectedType,
+      selectedOperator: this.selectedOperator,
+      sortBy: this.sortBy
+    };
+  }
+
+  hasActiveFilters(): boolean {
+    const state = this.getFilterState();
+    return Object.values(state).some(value => value.trim() !== '');
+  }
+
+  navigateToTour(tour: Tour): void {
+    this.router.navigate(['/tours', tour.id], {
+      queryParams: {
+        from: 'tours-list',
+        ...this.getFilterState()
+      }
+    });
+  }
+
+  refreshTours(): void {
+    this.loadTours();
   }
 
   trackByTourId(index: number, tour: Tour): string {
     return tour.id;
+  }
+
+  getTourTypeLabel(type: string): string {
+    const typeObj = this.tourTypes.find(t => t.value === type);
+    return typeObj ? typeObj.label : type;
+  }
+
+  formatPrice(price: string): string {
+    const numericPrice = price.replace(/[^\d,.-]/g, '');
+    return numericPrice || price;
+  }
+
+  isValidImageUrl(imageUrl: string): boolean {
+    return imageUrl && imageUrl.trim() !== '';
+  }
+
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = 'assets/images/placeholder.jpg';
+  }
+
+  get isLoading(): boolean {
+    return this.loading;
+  }
+
+  get hasError(): boolean {
+    return !!this.error;
+  }
+
+  get hasResults(): boolean {
+    return this.filteredTours.length > 0;
+  }
+
+  get showNoResults(): boolean {
+    return !this.loading && !this.error && this.filteredTours.length === 0;
   }
 }
