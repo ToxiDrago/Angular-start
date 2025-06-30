@@ -4,6 +4,11 @@
       "login": "admin",
       "password": "admin123",
       "email": "admin@example.com"
+    },
+    {
+      "login": "toxic2305@gmail.com",
+      "email": "toxic2305@gmail.com",
+      "password": "2323"
     }
   ]
 }
