@@ -1,0 +1,109 @@
+
+$primary-color: #667eea;
+$primary-dark: #5a6fd8;
+$primary-light: #7c8ce8;
+$secondary-color: #764ba2;
+$accent-color: #f093fb;
+
+$success-color: #28a745;
+$success-dark: #1e7e34;
+$danger-color: #dc3545;
+$danger-dark: #c82333;
+$warning-color: #ffc107;
+$warning-dark: #e0a800;
+$info-color: #17a2b8;
+$info-dark: #138496;
+
+$white: #ffffff;
+$light-gray: #f8f9fa;
+$gray-100: #f1f3f4;
+$gray-200: #e9ecef;
+$gray-300: #dee2e6;
+$gray-400: #ced4da;
+$gray-500: #adb5bd;
+$gray-600: #6c757d;
+$gray-700: #495057;
+$gray-800: #343a40;
+$gray-900: #212529;
+$black: #000000;
+
+$primary-gradient: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+$card-gradient: linear-gradient(145deg, $white 0%, #fafbfc 100%);
+$hover-gradient: linear-gradient(135deg, $primary-light 0%, $accent-color 100%);
+
+$font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+$font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+
+$font-size-xs: 0.75rem;    
+$font-size-sm: 0.875rem;  
+$font-size-base: 1rem;     
+$font-size-lg: 1.125rem;   
+$font-size-xl: 1.25rem;    
+$font-size-2xl: 1.5rem;    
+$font-size-3xl: 1.875rem;  
+$font-size-4xl: 2.25rem;   
+
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-extrabold: 800;
+
+$line-height-tight: 1.25;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.75;
+
+$spacing-xs: 0.25rem; 
+$spacing-sm: 0.5rem;    
+$spacing-md: 0.75rem;   
+$spacing-base: 1rem;    
+$spacing-lg: 1.5rem;   
+$spacing-xl: 2rem;     
+$spacing-2xl: 3rem;     
+$spacing-3xl: 4rem;   
+
+$border-radius-sm: 4px;
+$border-radius-base: 6px;
+$border-radius-md: 8px;
+$border-radius-lg: 12px;
+$border-radius-xl: 16px;
+$border-radius-full: 50%;
+
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-base: 0 2px 4px rgba(0, 0, 0, 0.1);
+$shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 8px 15px rgba(0, 0, 0, 0.1);
+$shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+
+$transition-fast: 0.15s ease;
+$transition-base: 0.3s ease;
+$transition-slow: 0.5s ease;
+
+$breakpoint-xs: 480px;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+$breakpoint-2xl: 1400px;
+
+$z-dropdown: 1000;
+$z-sticky: 1020;
+$z-fixed: 1030;
+$z-modal-backdrop: 1040;
+$z-modal: 1050;
+$z-popover: 1060;
+$z-tooltip: 1070;
+
+$container-sm: 540px;
+$container-md: 720px;
+$container-lg: 960px;
+$container-xl: 1140px;
+$container-2xl: 1320px;
+
+$tour-single-color: #28a745;
+$tour-multi-color: #007bff;
+$tour-premium-color: #ffc107;
+
+$tour-card-height: 400px;
+$tour-image-height: 200px;
