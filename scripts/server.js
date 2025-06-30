@@ -4,38 +4,17 @@ const express = require("express");
 const { log } = require("console");
 
 // user
-const userJson = "./src/app/shared/mocks/users.json";
+const userJson = "./server-data/users.json";
+const toursJson = "./server-data/tours.json";
+const jsonFileData = fs.readFileSync(userJson, "utf-8");
+let parseJsonData = JSON.parse(jsonFileData);
 
 const app = express();
 const port = 3000;
-
 // cors logic
 app.use(cors());
 // add parser for post body
 app.use(express.json());
-
-// Функция для чтения данных из файла
-function readUsersData() {
-  try {
-    const jsonFileData = fs.readFileSync(userJson, "utf-8");
-    return JSON.parse(jsonFileData);
-  } catch (error) {
-    console.error("Ошибка чтения файла:", error);
-    return { users: [] };
-  }
-}
-
-// Функция для записи данных в файл
-function writeUsersData(data) {
-  try {
-    const json = JSON.stringify(data, null, 2);
-    fs.writeFileSync(userJson, json, "utf-8");
-    return true;
-  } catch (error) {
-    console.error("Ошибка записи файла:", error);
-    return false;
-  }
-}
 
 // route logic
 app.get("/", (req, res) => {
@@ -44,74 +23,109 @@ app.get("/", (req, res) => {
 
 //************************ */ register****************************
 app.post("/register", (req, res) => {
-  try {
-    if (!req.body?.login) {
-      return res.status(400).json({ error: "не найдено свойство login" });
-    }
-
-    const parseJsonData = readUsersData();
-
+  // find users
+  if (req.body?.login) {
     const isUserExist = parseJsonData.users.find(
-      (user) => user.login === req.body.login
+      (user) => user.login === req.body?.login
     );
+    if (!isUserExist) {
+      parseJsonData.users.push(req.body);
+      const json = JSON.stringify(parseJsonData);
+      fs.writeFileSync(
+        userJson,
+        json,
+        "utf-8",
+        (data) => {},
+        (err) => {
+          console.log("err write file", err);
+        }
+      );
 
-    if (isUserExist) {
-      return res
-        .status(409)
-        .json({ error: "Пользователь уже зарегистрирован" });
-    }
-
-    parseJsonData.users.push(req.body);
-
-    if (writeUsersData(parseJsonData)) {
-      res.json({ message: "ok" });
+      // send response
+      res.send("ok");
     } else {
-      res.status(500).json({ error: "Ошибка сохранения данных" });
+      throw new Error("Пользователь уже зарегестрирован");
     }
-
-    console.log("parseJsonData Registration", parseJsonData);
-  } catch (error) {
-    console.error("Ошибка регистрации:", error);
-    res.status(500).json({ error: "Внутренняя ошибка сервера" });
+  } else {
+    throw new Error("не найдено свойство login");
   }
+  console.log("parseJsonData Registration", parseJsonData);
 });
 
 //************** */ auth**************************************
 app.post("/auth", (req, res) => {
-  try {
-    log("req.body", req.body);
+  log("req.body", req.body);
 
-    if (!req.body?.login || !req.body?.password) {
-      return res
-        .status(400)
-        .json({ error: "не найдено свойство login или password" });
-    }
-
-    const parseJsonData = readUsersData();
-    console.log("parseJsonData auth", parseJsonData);
-
-    if (!Array.isArray(parseJsonData?.users)) {
-      return res.status(500).json({ error: "Ошибка структуры данных" });
-    }
-
-    // check psw and login
-    const isUserExist = parseJsonData.users.find(
-      (user) =>
-        user.login === req.body.login && user.password === req.body.password
+  if (req.body?.login && req.body.password) {
+    // read file
+    const jsonFileData = fs.readFileSync(
+      userJson,
+      "utf-8",
+      (err, data) => {},
+      (err) => {
+        console.log("err read file", err);
+      }
     );
 
-    if (isUserExist) {
-      // Возвращаем только безопасные данные (без пароля)
-      const { password, ...userWithoutPassword } = isUserExist;
-      res.json(userWithoutPassword);
-    } else {
-      res
-        .status(401)
-        .json({ error: "AUTH-Error", message: "Неверный логин или пароль" });
+    // parse data
+    const parseJsonData = JSON.parse(jsonFileData);
+    console.log("parseJsonData auth", parseJsonData);
+
+    if (Array.isArray(parseJsonData?.users)) {
+      // check psw and login -- must contains password and login  field name
+      const isUserExist = parseJsonData?.users.find(
+        (user) =>
+          user.login === req.body?.login && user.password === req.body?.password
+      );
+
+      if (isUserExist) {
+        res.send(isUserExist);
+      } else {
+        // или отправить обьект с текстом ошибки
+        //res.send({error: true, errotText: 'Ошибка - пользователь не найден'});
+
+        // или явно выбросить исключения
+        throw new Error("AUTH-Error");
+      }
     }
-  } catch (error) {
-    console.error("Ошибка авторизации:", error);
-    res.status(500).json({ error: "Внутренняя ошибка сервера" });
+  } else {
+    throw new Error("не найдено свойство login или password");
+  }
+});
+
+//************** */ tours**************************************
+
+app.get("/tours", (req, res) => {
+  const jsonFileData = fs.readFileSync(
+    toursJson,
+    "utf-8",
+    (err, data) => {},
+    (err) => {
+      console.log("err read file tours", err);
+    }
+  );
+  res.send(jsonFileData);
+});
+
+/*******************get tour */
+app.get("/tour/:id", (req, res) => {
+  const jsonFileData = fs.readFileSync(
+    toursJson,
+    "utf-8",
+    (err, data) => {},
+    (err) => {
+      console.log("err read file tours", err);
+    }
+  );
+  // parse data
+  const parseJsonData = JSON.parse(jsonFileData);
+  const paramId = req.params.id;
+
+  const item = parseJsonData.tours.find((tour) => tour.id === paramId);
+  if (item) {
+    res.send(item);
+  } else {
+    throw new Error("Тур не найден по id:", paramId);
   }
 });
 
