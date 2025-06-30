@@ -40,15 +40,27 @@ export class LoginComponent {
         next: (response) => {
           this.authService.setCurrentUser(response);
           this.notificationService.showSuccess('Успешная авторизация', `Добро пожаловать, ${response.login}!`);
-          this.router.navigate(['/dashboard']);
+          
+          this.router.navigate(['/tickets']);
           this.isLoading = false;
         },
         error: (error) => {
           console.error('Ошибка авторизации:', error);
+          
           let errorMessage = 'Неверный логин или пароль';
+          
           if (error.error?.message) {
             errorMessage = error.error.message;
+          } else if (error.error?.error) {
+            errorMessage = error.error.error;
+          } else if (error.status === 401) {
+            errorMessage = 'Неверный логин или пароль';
+          } else if (error.status === 500) {
+            errorMessage = 'Ошибка сервера. Попробуйте позже';
+          } else if (error.status === 0) {
+            errorMessage = 'Нет соединения с сервером';
           }
+          
           this.notificationService.showError('Ошибка авторизации', errorMessage);
           this.isLoading = false;
         }

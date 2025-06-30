@@ -1,0 +1,78 @@
+<div class="tickets-container">
+  <div class="tickets-header">
+    <h1>Система тикетов</h1>
+    <div class="user-info" *ngIf="currentUser">
+      <p>
+        Пользователь: <strong>{{ currentUser.login }}</strong>
+      </p>
+      <p *ngIf="currentUser.email">
+        Email: <strong>{{ currentUser.email }}</strong>
+      </p>
+    </div>
+    <button class="logout-btn" (click)="logout()">Выйти</button>
+  </div>
+
+  <div class="tickets-content">
+    <div class="tickets-actions">
+      <button class="create-ticket-btn">Создать тикет</button>
+    </div>
+
+    <div class="tickets-list" *ngIf="tickets.length > 0; else noTickets">
+      <div class="ticket-card" *ngFor="let ticket of tickets">
+        <div class="ticket-header">
+          <h3>{{ ticket.title }}</h3>
+          <div class="ticket-meta">
+            <span class="ticket-id">#{{ ticket.id }}</span>
+            <span
+              class="ticket-status"
+              [ngClass]="getStatusClass(ticket.status)"
+            >
+              {{
+                ticket.status === "open"
+                  ? "Открыт"
+                  : ticket.status === "in-progress"
+                  ? "В работе"
+                  : "Закрыт"
+              }}
+            </span>
+            <span
+              class="ticket-priority"
+              [ngClass]="getPriorityClass(ticket.priority)"
+            >
+              {{
+                ticket.priority === "high"
+                  ? "Высокий"
+                  : ticket.priority === "medium"
+                  ? "Средний"
+                  : "Низкий"
+              }}
+            </span>
+          </div>
+        </div>
+
+        <div class="ticket-body">
+          <p>{{ ticket.description }}</p>
+        </div>
+
+        <div class="ticket-footer">
+          <span class="ticket-date">
+            Создан: {{ ticket.createdAt | date : "dd.MM.yyyy HH:mm" }}
+          </span>
+          <div class="ticket-actions">
+            <button class="btn-view">Просмотр</button>
+            <button class="btn-edit" *ngIf="ticket.status !== 'closed'">
+              Редактировать
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noTickets>
+      <div class="no-tickets">
+        <p>У вас пока нет тикетов</p>
+        <button class="create-ticket-btn">Создать первый тикет</button>
+      </div>
+    </ng-template>
+  </div>
+</div>
