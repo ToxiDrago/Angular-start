@@ -1,0 +1,82 @@
+<header class="header">
+  <div class="container">
+    <div class="header-content">
+      <div class="header-brand">
+        <h1 class="brand-title">{{ appTitle }}</h1>
+        <div class="header-date">
+          <span class="date-time">
+            {{ currentDate | date : "medium" }}
+          </span>
+          <br />
+          <small class="date-short">
+            {{ currentDate | date : "shortDate" }}
+          </small>
+        </div>
+      </div>
+
+      <nav class="header-nav" *ngIf="!isLoginPage()">
+        <ul class="nav-menu">
+          <li class="nav-item">
+            <a routerLink="/tours" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-map"></i>
+              Туры
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              routerLink="/dashboard"
+              routerLinkActive="active"
+              class="nav-link"
+            >
+              <i class="pi pi-home"></i>
+              Главная
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/tickets" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-ticket"></i>
+              Билеты
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <nav class="header-nav" *ngIf="isLoginPage()">
+        <ul class="nav-menu">
+          <li class="nav-item">
+            <a routerLink="/login" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-sign-in"></i>
+              Вход
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              routerLink="/registration"
+              routerLinkActive="active"
+              class="nav-link"
+            >
+              <i class="pi pi-user-plus"></i>
+              Регистрация
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="header-user" *ngIf="currentUser">
+        <div class="user-info">
+          <span class="user-name">
+            <i class="pi pi-user"></i>
+            {{ currentUser.login }}
+          </span>
+          <span class="user-email" *ngIf="currentUser.email">
+            {{ currentUser.email }}
+          </span>
+        </div>
+        <button class="logout-btn" (click)="logout()">
+          <i class="pi pi-sign-out"></i>
+          Выйти
+        </button>
+      </div>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,162 @@
+<div class="tours-container">
+  <div class="container">
+    <div class="page-header">
+      <h1 class="page-title">Каталог туров</h1>
+      <p class="page-description">
+        Найдите идеальный тур для вашего путешествия
+      </p>
+    </div>
+
+    <div class="filters-panel card">
+      <div class="filters-header">
+        <h3>Поиск и фильтры</h3>
+        <button class="btn btn-secondary" (click)="resetFilters()">
+          <i class="pi pi-refresh"></i>
+          Сбросить
+        </button>
+      </div>
+
+      <div class="filters-content">
+        <div class="filter-group">
+          <label class="form-label">Поиск по названию</label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Введите название тура или описание..."
+            [(ngModel)]="searchTerm"
+            (input)="applyFilters()"
+          />
+        </div>
+
+        <div class="filter-group">
+          <label class="form-label">Тип тура</label>
+          <select
+            class="form-control"
+            [(ngModel)]="selectedType"
+            (change)="applyFilters()"
+          >
+            @for (type of tourTypes; track type.value) {
+            <option [value]="type.value">{{ type.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="form-label">Туроператор</label>
+          <select
+            class="form-control"
+            [(ngModel)]="selectedOperator"
+            (change)="applyFilters()"
+          >
+            <option value="">Все операторы</option>
+            @for (operator of tourOperators; track operator) {
+            <option [value]="operator">{{ operator }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="form-label">Сортировка</label>
+          <select
+            class="form-control"
+            [(ngModel)]="sortBy"
+            (change)="applyFilters()"
+          >
+            <option value="">По умолчанию</option>
+            <option value="name">По названию</option>
+            <option value="price-asc">По цене (возрастание)</option>
+            <option value="price-desc">По цене (убывание)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="results-info">
+      @if (loading) {
+      <div class="loading-message">
+        <i class="pi pi-spinner pi-spin"></i>
+        Загрузка туров...
+      </div>
+      } @else {
+      <p class="results-count">
+        Найдено туров: <strong>{{ filteredTours.length }}</strong> из
+        {{ tours.length }}
+      </p>
+      }
+    </div>
+
+    <div class="tours-grid">
+      @if (loading) {
+      <div class="loading-placeholder">
+        @for (item of [1,2,3,4,5,6]; track item) {
+        <div class="tour-card-skeleton">
+          <div class="skeleton-image"></div>
+          <div class="skeleton-content">
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line short"></div>
+            <div class="skeleton-line"></div>
+          </div>
+        </div>
+        }
+      </div>
+      } @else if (filteredTours.length === 0) {
+      <div class="no-results">
+        <i class="pi pi-search"></i>
+        <h3>Туры не найдены</h3>
+        <p>Попробуйте изменить параметры поиска или сбросить фильтры</p>
+        <button class="btn btn-primary" (click)="resetFilters()">
+          Показать все туры
+        </button>
+      </div>
+      } @else { @for (tour of filteredTours; track trackByTourId($index, tour))
+      {
+      <div class="tour-card">
+        <div class="tour-image">
+          <img
+            [src]="'assets/images/' + tour.img"
+            [alt]="tour.name"
+            onerror="this.src='assets/images/placeholder.jpg'"
+          />
+          @if (tour.type) {
+          <span class="tour-type-badge" [class]="'type-' + tour.type">
+            {{ tour.type === "single" ? "Одиночный" : "Групповой" }}
+          </span>
+          }
+        </div>
+
+        <div class="tour-content">
+          <h3 class="tour-title">{{ tour.name }}</h3>
+
+          <p class="tour-description">
+            {{
+              tour.description.length > 120
+                ? (tour.description | slice : 0 : 120) + "..."
+                : tour.description
+            }}
+          </p>
+
+          <div class="tour-meta">
+            <div class="tour-operator">
+              <i class="pi pi-building"></i>
+              <span>{{ tour.tourOperator }}</span>
+            </div>
+
+            @if (tour.date) {
+            <div class="tour-date">
+              <i class="pi pi-calendar"></i>
+              <span>{{ tour.date | date : "shortDate" }}</span>
+            </div>
+            }
+          </div>
+
+          <div class="tour-footer">
+            <div class="tour-price">
+              <span class="price-label">от</span>
+              <span class="price-amount">{{ tour.price }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
