@@ -27,9 +27,12 @@ export class AuthService {
     private http: HttpClient,
     private router: Router
   ) {
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-      this.currentUserSubject.next(JSON.parse(savedUser));
+    // Проверяем наличие localStorage (может отсутствовать в SSR)
+    if (typeof localStorage !== 'undefined') {
+      const savedUser = localStorage.getItem('currentUser');
+      if (savedUser) {
+        this.currentUserSubject.next(JSON.parse(savedUser));
+      }
     }
   }
 
@@ -42,12 +45,16 @@ export class AuthService {
   }
 
   setCurrentUser(user: AuthResponse): void {
-    localStorage.setItem('currentUser', JSON.stringify(user));
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('currentUser', JSON.stringify(user));
+    }
     this.currentUserSubject.next(user);
   }
 
   logout(): void {
-    localStorage.removeItem('currentUser');
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('currentUser');
+    }
     this.currentUserSubject.next(null);
     this.router.navigate(['/login']);
   }

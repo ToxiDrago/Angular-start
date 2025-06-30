@@ -55,7 +55,11 @@ export class RegistrationComponent {
         },
         error: (error) => {
           console.error('Ошибка регистрации:', error);
-          this.notificationService.showError('Ошибка регистрации', 'Пользователь с таким логином уже существует');
+          let errorMessage = 'Произошла ошибка при регистрации';
+          if (error.error?.error === 'Пользователь уже зарегистрирован') {
+            errorMessage = 'Пользователь с таким логином уже существует';
+          }
+          this.notificationService.showError('Ошибка регистрации', errorMessage);
           this.isLoading = false;
         }
       });

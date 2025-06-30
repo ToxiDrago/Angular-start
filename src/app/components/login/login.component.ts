@@ -45,7 +45,11 @@ export class LoginComponent {
         },
         error: (error) => {
           console.error('Ошибка авторизации:', error);
-          this.notificationService.showError('Ошибка авторизации', 'Неверный логин или пароль');
+          let errorMessage = 'Неверный логин или пароль';
+          if (error.error?.message) {
+            errorMessage = error.error.message;
+          }
+          this.notificationService.showError('Ошибка авторизации', errorMessage);
           this.isLoading = false;
         }
       });
