@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ToursService, Tour, ToursResponse } from '../../shared/services/tours.service';
-import { NotificationService } from '../../shared/services/notification.service
+import { NotificationService } from '../../shared/services/notification.service';
 
 @Component({
   selector: 'app-tours',

@@ -1,0 +1,82 @@
+<div class="tour-item-container">
+  <div class="container">
+    @if (loading) {
+    <div class="loading-state">
+      <i class="pi pi-spinner pi-spin"></i>
+      <p>Загрузка тура...</p>
+    </div>
+    } @else if (error) {
+    <div class="error-state">
+      <i class="pi pi-exclamation-triangle"></i>
+      <h2>Ошибка загрузки</h2>
+      <p>{{ error }}</p>
+      <div class="error-actions">
+        <button class="btn btn-primary" (click)="goBack()">
+          <i class="pi pi-arrow-left"></i>
+          Вернуться к турам
+        </button>
+      </div>
+    </div>
+    } @else if (tour) {
+    <div class="tour-detail">
+      <div class="tour-header">
+        <button class="back-btn" (click)="goBack()">
+          <i class="pi pi-arrow-left"></i>
+          Назад к турам
+        </button>
+        <div class="tour-badges">
+          @if (tour.type) {
+          <span class="badge" [class]="'badge-' + tour.type">
+            {{ tour.type === "single" ? "Одиночный" : "Групповой" }}
+          </span>
+          }
+        </div>
+      </div>
+
+      <div class="tour-content">
+        <div class="tour-image-section">
+          <img
+            [src]="'assets/images/' + tour.img"
+            [alt]="tour.name"
+            class="tour-main-image"
+            onerror="this.src='assets/images/placeholder.jpg'"
+          />
+        </div>
+
+        <div class="tour-info-section">
+          <h1 class="tour-title">{{ tour.name }}</h1>
+
+          <div class="tour-meta">
+            <div class="meta-item">
+              <i class="pi pi-building"></i>
+              <span>{{ tour.tourOperator }}</span>
+            </div>
+            @if (tour.date) {
+            <div class="meta-item">
+              <i class="pi pi-calendar"></i>
+              <span>{{ tour.date | date : "fullDate" }}</span>
+            </div>
+            }
+          </div>
+
+          <div class="tour-description">
+            <h3>Описание тура</h3>
+            <p>{{ tour.description }}</p>
+          </div>
+
+          <div class="tour-pricing">
+            <div class="price-info">
+              <span class="price-label">Стоимость тура</span>
+              <span class="price-amount">{{ tour.price }}</span>
+            </div>
+            <button class="btn btn-primary btn-large" (click)="bookTour()">
+              <i class="pi pi-calendar-plus"></i>
+              Забронировать тур
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+</div>

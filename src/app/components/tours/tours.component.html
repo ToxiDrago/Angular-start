@@ -110,7 +110,7 @@
       </div>
       } @else { @for (tour of filteredTours; track trackByTourId($index, tour))
       {
-      <div class="tour-card">
+      <div class="tour-card" [routerLink]="['/tours', tour.id]">
         <div class="tour-image">
           <img
             [src]="'assets/images/' + tour.img"
@@ -154,9 +154,14 @@
               <span class="price-label">от</span>
               <span class="price-amount">{{ tour.price }}</span>
             </div>
+            <button class="btn btn-primary btn-sm">
+              <i class="pi pi-eye"></i>
+              Подробнее
+            </button>
           </div>
         </div>
       </div>
+      } }
     </div>
   </div>
 </div>
