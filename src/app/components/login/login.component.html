@@ -11,6 +11,7 @@
         name="login"
         placeholder="Введите логин"
         required
+        [disabled]="isLoading"
       />
     </div>
 
@@ -23,11 +24,16 @@
         name="password"
         placeholder="Введите пароль"
         required
+        [disabled]="isLoading"
       />
     </div>
 
-    <button type="submit" [disabled]="!isFormValid" class="submit-btn">
-      Войти
+    <button
+      type="submit"
+      [disabled]="!isFormValid || isLoading"
+      class="submit-btn"
+    >
+      {{ isLoading ? "Вход..." : "Войти" }}
     </button>
   </form>
 </div>

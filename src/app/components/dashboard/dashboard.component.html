@@ -1,0 +1,19 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>Добро пожаловать!</h1>
+    <div class="user-info" *ngIf="currentUser">
+      <p>
+        Пользователь: <strong>{{ currentUser.login }}</strong>
+      </p>
+      <p *ngIf="currentUser.email">
+        Email: <strong>{{ currentUser.email }}</strong>
+      </p>
+    </div>
+    <button class="logout-btn" (click)="logout()">Выйти</button>
+  </div>
+
+  <div class="dashboard-content">
+    <h2>Главная страница</h2>
+    <p>Вы успешно авторизовались в системе!</p>
+  </div>
+</div>

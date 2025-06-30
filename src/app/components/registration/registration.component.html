@@ -3,6 +3,19 @@
 
   <form (ngSubmit)="onSubmit()" class="registration-form">
     <div class="form-group">
+      <label for="login">Логин:</label>
+      <input
+        type="text"
+        id="login"
+        [(ngModel)]="login"
+        name="login"
+        placeholder="Введите логин"
+        required
+        [disabled]="isLoading"
+      />
+    </div>
+
+    <div class="form-group">
       <label for="email">Email:</label>
       <input
         type="email"
@@ -11,6 +24,7 @@
         name="email"
         placeholder="Введите email"
         required
+        [disabled]="isLoading"
       />
     </div>
 
@@ -23,6 +37,7 @@
         name="password"
         placeholder="Введите пароль"
         required
+        [disabled]="isLoading"
       />
     </div>
 
@@ -35,6 +50,7 @@
         name="confirmPassword"
         placeholder="Повторите пароль"
         required
+        [disabled]="isLoading"
       />
 
       @if (confirmPassword.length > 0 && !passwordsMatch) {
@@ -42,8 +58,12 @@
       }
     </div>
 
-    <button type="submit" [disabled]="!isFormValid" class="submit-btn">
-      Зарегистрироваться
+    <button
+      type="submit"
+      [disabled]="!isFormValid || isLoading"
+      class="submit-btn"
+    >
+      {{ isLoading ? "Регистрация..." : "Зарегистрироваться" }}
     </button>
   </form>
 </div>

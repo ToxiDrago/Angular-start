@@ -1,8 +1,19 @@
 <div class="app-container">
-  <nav class="navigation">
+  <nav class="navigation" *ngIf="!isLoginPage()">
+    <div class="nav-links">
+      <a routerLink="/dashboard" routerLinkActive="active">Главная</a>
+    </div>
+    <div class="nav-user" *ngIf="currentUser">
+      <span>{{ currentUser.login }}</span>
+      <button class="logout-btn" (click)="logout()">Выйти</button>
+    </div>
+  </nav>
+
+  <nav class="navigation" *ngIf="isLoginPage()">
     <a routerLink="/login" routerLinkActive="active">Вход</a>
     <a routerLink="/registration" routerLinkActive="active">Регистрация</a>
   </nav>
 
   <router-outlet></router-outlet>
+  <p-toast></p-toast>
 </div>
