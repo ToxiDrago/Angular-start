@@ -13,6 +13,9 @@
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
+      "i18n": {
+        "sourceLocale": "ru"
+      },
       "architect": {
         "build": {
           "builder": "@angular/build:application",

@@ -3,9 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
-import { ToursService, Tour, ToursResponse } from '../../shared/services/tours.service';
+import { ToursService } from '../../shared/services/tours.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { ImageService } from '../../shared/services/image.service';
+import { Tour, ToursResponse, TourFilter, TourSortOptions } from '../../shared/models';
 
 @Component({
   selector: 'app-tours',
@@ -116,7 +117,6 @@ export class ToursComponent implements OnInit, OnDestroy {
       return this.imageService.getPlaceholder('landscape');
     }
     
-    // If it's just a filename, prepend assets path
     if (!imageUrl.includes('/') && imageUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
       return `assets/images/${imageUrl}`;
     }
@@ -136,7 +136,6 @@ export class ToursComponent implements OnInit, OnDestroy {
   }
 
   onImageLoad(tourId: string): void {
-    // Image loaded successfully
   }
 
   isImageLoaded(tourId: string): boolean {
@@ -148,7 +147,6 @@ export class ToursComponent implements OnInit, OnDestroy {
     return 'tour-image';
   }
 
-  // ... rest of your existing methods remain the same
   onSearchInput(event: Event): void {
     const target = event.target as HTMLInputElement;
     this.searchSubject.next(target.value);
@@ -157,52 +155,36 @@ export class ToursComponent implements OnInit, OnDestroy {
   applyFilters(): void {
     if (this.tours.length === 0) return;
 
-    let result = [...this.tours];
+    const filter: TourFilter = {
+      searchTerm: this.searchTerm.trim(),
+      type: this.selectedType,
+      operator: this.selectedOperator
+    };
 
-    if (this.searchTerm.trim()) {
-      result = this.toursService.searchTours(result, this.searchTerm.trim());
+    this.filteredTours = this.toursService.applyFilters(this.tours, filter);
+
+    if (this.sortBy) {
+      const sortOptions = this.parseSortBy(this.sortBy);
+      this.filteredTours = this.toursService.sortTours(this.filteredTours, sortOptions);
     }
 
-    if (this.selectedType) {
-      result = this.toursService.filterToursByType(result, this.selectedType);
-    }
-
-    if (this.selectedOperator) {
-      result = result.filter(tour => 
-        tour.tourOperator === this.selectedOperator
-      );
-    }
-
-    result = this.applySorting(result);
-
-    this.filteredTours = result;
-    this.filteredCount = result.length;
+    this.filteredCount = this.filteredTours.length;
   }
 
-  private applySorting(tours: Tour[]): Tour[] {
-    switch (this.sortBy) {
+  private parseSortBy(sortBy: string): TourSortOptions {
+    switch (sortBy) {
       case 'name':
-        return tours.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
-      
+        return { field: 'name', direction: 'asc' };
       case 'price-asc':
-        return this.toursService.sortToursByPrice(tours, true);
-      
+        return { field: 'price', direction: 'asc' };
       case 'price-desc':
-        return this.toursService.sortToursByPrice(tours, false);
-      
+        return { field: 'price', direction: 'desc' };
       case 'operator':
-        return tours.sort((a, b) => a.tourOperator.localeCompare(b.tourOperator, 'ru'));
-      
+        return { field: 'operator', direction: 'asc' };
       case 'date':
-        return tours.sort((a, b) => {
-          if (!a.date && !b.date) return 0;
-          if (!a.date) return 1;
-          if (!b.date) return -1;
-          return new Date(a.date).getTime() - new Date(b.date).getTime();
-        });
-      
+        return { field: 'date', direction: 'asc' };
       default:
-        return tours;
+        return { field: 'name', direction: 'asc' };
     }
   }
 
@@ -240,7 +222,7 @@ export class ToursComponent implements OnInit, OnDestroy {
   }
 
   formatPrice(price: string): string {
-    return price.replace(/[^\d,.-€]/g, '') || price;
+    return this.toursService.formatPrice(price);
   }
 
   get isLoading(): boolean {

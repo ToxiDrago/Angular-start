@@ -27,7 +27,7 @@
         <div class="tour-badges">
           @if (tour.type) {
           <span class="badge" [class]="'badge-' + tour.type">
-            {{ tour.type === "single" ? "Одиночный" : "Групповой" }}
+            {{ getTourTypeLabel() }}
           </span>
           }
         </div>
@@ -35,12 +35,17 @@
 
       <div class="tour-content">
         <div class="tour-image-section">
-          <img
-            [src]="getImageUrl(tour.img)"
-            [alt]="tour.name"
-            class="tour-main-image"
-            (error)="onImageError($event)"
-          />
+          <div class="image-container">
+            <img
+              [src]="tour.img"
+              [alt]="tour.name"
+              class="tour-main-image"
+              (error)="onImageError($event)"
+            />
+            <div class="image-overlay">
+              <span class="tour-id">ID: {{ tour.id }}</span>
+            </div>
+          </div>
         </div>
 
         <div class="tour-info-section">
@@ -56,6 +61,11 @@
               <i class="pi pi-calendar"></i>
               <span>{{ tour.date | date : "fullDate" }}</span>
             </div>
+            } @if (tour.createdAt) {
+            <div class="meta-item">
+              <i class="pi pi-clock"></i>
+              <span>Создано: {{ tour.createdAt | date : "short" }}</span>
+            </div>
             }
           </div>
 
@@ -64,10 +74,44 @@
             <p>{{ tour.description }}</p>
           </div>
 
+          @if (tour.firstName || tour.lastName || tour.age || tour.citizenship)
+          {
+          <div class="tour-additional-info">
+            <h3>Дополнительная информация</h3>
+            <div class="info-grid">
+              @if (tour.firstName || tour.lastName) {
+              <div class="info-item">
+                <span class="info-label">Контактное лицо:</span>
+                <span class="info-value"
+                  >{{ tour.firstName }} {{ tour.lastName }}</span
+                >
+              </div>
+              } @if (tour.age) {
+              <div class="info-item">
+                <span class="info-label">Возраст:</span>
+                <span class="info-value">{{ tour.age }} лет</span>
+              </div>
+              } @if (tour.citizenship) {
+              <div class="info-item">
+                <span class="info-label">Гражданство:</span>
+                <span class="info-value">{{ tour.citizenship }}</span>
+              </div>
+              } @if (tour.birthDate) {
+              <div class="info-item">
+                <span class="info-label">Дата рождения:</span>
+                <span class="info-value">{{
+                  tour.birthDate | date : "shortDate"
+                }}</span>
+              </div>
+              }
+            </div>
+          </div>
+          }
+
           <div class="tour-pricing">
             <div class="price-info">
               <span class="price-label">Стоимость тура</span>
-              <span class="price-amount">{{ tour.price }}</span>
+              <span class="price-amount">{{ getTourPrice() }}</span>
             </div>
             <button class="btn btn-primary btn-large" (click)="bookTour()">
               <i class="pi pi-calendar-plus"></i>
@@ -75,6 +119,25 @@
             </button>
           </div>
         </div>
+      </div>
+
+      <div class="tour-actions">
+        <button class="btn btn-secondary" (click)="goBack()">
+          <i class="pi pi-arrow-left"></i>
+          Вернуться к списку
+        </button>
+
+        @if (isTourValid()) {
+        <button class="btn btn-success" (click)="bookTour()">
+          <i class="pi pi-check"></i>
+          Забронировать
+        </button>
+        }
+
+        <button class="btn btn-info" (click)="bookTour()">
+          <i class="pi pi-info-circle"></i>
+          Подробнее
+        </button>
       </div>
     </div>
     }

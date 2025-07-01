@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ToursService, Tour } from '../../shared/services/tours.service';
+import { ToursService } from '../../shared/services/tours.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { ImageService } from '../../shared/services/image.service';
+import { Tour } from '../../shared/models';
 
 @Component({
   selector: 'app-tour-item',
@@ -13,20 +14,21 @@ import { ImageService } from '../../shared/services/image.service';
   styleUrls: ['./tour-item.component.scss']
 })
 export class TourItemComponent implements OnInit {
+  // Инжектирование сервисов
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private toursService = inject(ToursService);
+  private notificationService = inject(NotificationService);
+  private imageService = inject(ImageService);
+
+  // 3.1 - Создание свойства tour с указанием типа
   tour: Tour | null = null;
   tourId: string | null = null;
   loading = true;
   error: string | null = null;
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private toursService: ToursService,
-    private notificationService: NotificationService,
-    private imageService: ImageService
-  ) {}
-
   ngOnInit(): void {
+    // Получение ID тура из параметров маршрута
     this.route.paramMap.subscribe(params => {
       this.tourId = params.get('id');
       if (this.tourId) {
@@ -38,21 +40,48 @@ export class TourItemComponent implements OnInit {
     });
   }
 
+  // 3.2 и 3.3 - Выполнение запроса getTourById и запись ответа в tour
   private loadTour(id: string): void {
     this.loading = true;
     this.error = null;
 
+    this.toursService.getTourById(id).subscribe({
+      next: (tourData: Tour) => {
+        // 3.3 - При успешном ответе записываем данные тура
+        this.tour = {
+          ...tourData,
+          img: this.processImageUrl(tourData.img)
+        };
+        
+        this.notificationService.showSuccess('Успех', 'Тур загружен');
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Ошибка загрузки тура:', error);
+        
+        // Попробуем загрузить из списка всех туров как fallback
+        this.loadTourFromAllTours(id);
+      }
+    });
+  }
+
+  // Fallback метод для загрузки тура из общего списка
+  private loadTourFromAllTours(id: string): void {
     this.toursService.getTours().subscribe({
       next: (jsonString: string) => {
         try {
           const toursData = this.toursService.parseToursData(jsonString);
-          this.tour = toursData.tours?.find(t => t.id === id) || null;
+          const foundTour = toursData.tours?.find(t => t.id === id);
           
-          if (!this.tour) {
+          if (foundTour) {
+            this.tour = {
+              ...foundTour,
+              img: this.processImageUrl(foundTour.img)
+            };
+            this.notificationService.showSuccess('Успех', 'Тур загружен');
+          } else {
             this.error = 'Тур не найден';
             this.notificationService.showError('Ошибка', 'Тур с указанным ID не найден');
-          } else {
-            this.notificationService.showSuccess('Успех', 'Тур загружен');
           }
         } catch (error) {
           console.error('Ошибка обработки данных тура:', error);
@@ -71,7 +100,7 @@ export class TourItemComponent implements OnInit {
     });
   }
 
-  getImageUrl(imageUrl: string): string {
+  processImageUrl(imageUrl: string): string {
     if (!imageUrl) {
       return this.imageService.getPlaceholder('landscape');
     }
@@ -103,5 +132,25 @@ export class TourItemComponent implements OnInit {
     if (this.tour) {
       this.notificationService.showInfo('Информация', `Бронирование тура "${this.tour.name}"`);
     }
+  }
+
+  // Дополнительные методы для работы с туром
+  getTourPrice(): string {
+    return this.tour ? this.toursService.formatPrice(this.tour.price) : '';
+  }
+
+  getTourTypeLabel(): string {
+    if (!this.tour?.type) return '';
+    
+    const typeLabels = {
+      'single': 'Одиночный тур',
+      'multi': 'Групповой тур'
+    };
+    
+    return typeLabels[this.tour.type] || this.tour.type;
+  }
+
+  isTourValid(): boolean {
+    return this.tour ? this.toursService.validateTour(this.tour) : false;
   }
 }
