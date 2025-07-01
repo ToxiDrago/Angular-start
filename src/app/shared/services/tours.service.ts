@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { ConfigService } from './config.service';
 
 export interface Tour {
   id: string;
@@ -30,9 +30,12 @@ export interface ToursResponse {
   providedIn: 'root'
 })
 export class ToursService {
-  private apiUrl = environment.apiUrl;
-
-  constructor(private http: HttpClient) {}
+  private configService = inject(ConfigService);
+  private http = inject(HttpClient);
+  
+  private get apiUrl(): string {
+    return this.configService.get('apiUrl');
+  }
 
   getTours(): Observable<string> {
     return this.http.get<string>(`${this.apiUrl}/tours`);
@@ -44,12 +47,10 @@ export class ToursService {
 
   parseToursData(data: any): ToursResponse {
     try {
-      // Если данные уже объект, возвращаем как есть
       if (typeof data === 'object' && data !== null) {
         return data as ToursResponse;
       }
       
-      // Если данные строка, парсим JSON
       if (typeof data === 'string') {
         return JSON.parse(data) as ToursResponse;
       }
@@ -88,5 +89,9 @@ export class ToursService {
   getTourOperators(tours: Tour[]): string[] {
     const operators = tours.map(tour => tour.tourOperator);
     return [...new Set(operators)].sort();
+  }
+
+  getItemsPerPage(): number {
+    return this.configService.get('ui').itemsPerPage;
   }
 }

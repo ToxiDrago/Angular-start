@@ -1,7 +1,8 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, inject } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService, AuthResponse } from '../../shared/services/auth.service';
+import { ConfigService } from '../../shared/services/config.service';
 
 @Component({
   selector: 'app-header',
@@ -12,16 +13,20 @@ import { AuthService, AuthResponse } from '../../shared/services/auth.service';
   encapsulation: ViewEncapsulation.Emulated
 })
 export class HeaderComponent implements OnInit {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private configService = inject(ConfigService);
+
   currentUser: AuthResponse | null = null;
   currentDate = new Date();
-  appTitle = 'Tour Management System';
-
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  appTitle = '';
+  appVersion = '';
 
   ngOnInit(): void {
+    // Get app title from config
+    this.appTitle = this.configService.get('appTitle');
+    this.appVersion = this.configService.get('version');
+
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
     });
@@ -41,5 +46,9 @@ export class HeaderComponent implements OnInit {
 
   isActivePage(route: string): boolean {
     return this.router.url === route;
+  }
+
+  getAppInfo(): string {
+    return `${this.appTitle} v${this.appVersion}`;
   }
 }

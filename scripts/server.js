@@ -3,23 +3,19 @@ const cors = require("cors");
 const express = require("express");
 const path = require("path");
 
-// FIXED: Point to the correct server-data directory
 const userJson = path.join(__dirname, "..", "server-data", "users.json");
 const toursJson = path.join(__dirname, "..", "server-data", "tours.json");
 
-// Enhanced file existence check with better error messages
 if (!fs.existsSync(userJson)) {
   console.error(`❌ User file not found: ${userJson}`);
   console.log("💡 Expected location: server-data/users.json");
 
-  // Create server-data directory if it doesn't exist
   const serverDataDir = path.join(__dirname, "..", "server-data");
   if (!fs.existsSync(serverDataDir)) {
     fs.mkdirSync(serverDataDir, { recursive: true });
     console.log("📁 Created server-data directory");
   }
 
-  // Create default users.json
   const defaultUsers = {
     users: [
       {
@@ -43,7 +39,6 @@ if (!fs.existsSync(toursJson)) {
   console.error(`❌ Tours file not found: ${toursJson}`);
   console.log("💡 Expected location: server-data/tours.json");
 
-  // Check if tours.json exists in root and copy it
   const rootToursJson = path.join(__dirname, "..", "tours.json");
   if (fs.existsSync(rootToursJson)) {
     console.log(
@@ -62,18 +57,14 @@ if (!fs.existsSync(toursJson)) {
 const app = express();
 const port = 3000;
 
-// CORS logic
 app.use(cors());
-// Add parser for post body
 app.use(express.json());
 
-// Enhanced logging middleware
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
   next();
 });
 
-// Route logic
 app.get("/", (req, res) => {
   res.json({
     message: "Tour Management API Server",
@@ -82,7 +73,6 @@ app.get("/", (req, res) => {
   });
 });
 
-//************************ REGISTER ****************************
 app.post("/register", (req, res) => {
   try {
     console.log("📝 Registration attempt:", {
@@ -142,7 +132,6 @@ app.post("/auth", (req, res) => {
 
         if (isUserExist) {
           console.log("✅ Authentication successful:", req.body.login);
-          // Don't send password back to client
           const { password, ...userResponse } = isUserExist;
           res.json(userResponse);
         } else {

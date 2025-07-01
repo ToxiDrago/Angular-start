@@ -2,7 +2,7 @@
   <div class="container">
     <div class="header-content">
       <div class="header-brand">
-        <h1 class="brand-title">{{ appTitle }}</h1>
+        <h1 class="brand-title" [title]="getAppInfo()">{{ appTitle }}</h1>
         <div class="header-date">
           <span class="date-time">
             {{ currentDate | date : "medium" }}
@@ -12,16 +12,11 @@
             {{ currentDate | date : "shortDate" }}
           </small>
         </div>
+        <small class="app-version">v{{ appVersion }}</small>
       </div>
 
       <nav class="header-nav" *ngIf="!isLoginPage()">
         <ul class="nav-menu">
-          <li class="nav-item">
-            <a routerLink="/tours" routerLinkActive="active" class="nav-link">
-              <i class="pi pi-map"></i>
-              Туры
-            </a>
-          </li>
           <li class="nav-item">
             <a
               routerLink="/dashboard"
@@ -30,6 +25,12 @@
             >
               <i class="pi pi-home"></i>
               Главная
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/tours" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-map"></i>
+              Туры
             </a>
           </li>
           <li class="nav-item">
