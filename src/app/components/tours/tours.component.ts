@@ -44,6 +44,9 @@ export class ToursComponent implements OnInit, OnDestroy {
   totalTours = 0;
   filteredCount = 0;
 
+  private placeholderImage = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNzUgMTI1SDE4NVYxMzVIMTc1VjEyNVoiIGZpbGw9IiM5Q0EzQUYiLz4KPHA=">';
+  private imageLoadingStates = new Map<string, boolean>();
+
   constructor(
     private toursService: ToursService,
     private notificationService: NotificationService,
@@ -81,7 +84,11 @@ export class ToursComponent implements OnInit, OnDestroy {
             throw new Error('Некорректный формат данных туров');
           }
 
-          this.tours = toursData.tours;
+          this.tours = toursData.tours.map(tour => ({
+            ...tour,
+            img: this.getValidImageUrl(tour.img)
+          }));
+          
           this.filteredTours = [...this.tours];
           this.totalTours = this.tours.length;
           this.filteredCount = this.filteredTours.length;
@@ -219,13 +226,73 @@ export class ToursComponent implements OnInit, OnDestroy {
     return numericPrice || price;
   }
 
-  isValidImageUrl(imageUrl: string): boolean {
-    return imageUrl && imageUrl.trim() !== '';
+  getValidImageUrl(imageUrl: string): string {
+    if (!imageUrl || imageUrl.trim() === '') {
+      return this.placeholderImage;
+    }
+
+    if (imageUrl.startsWith('assets/') || imageUrl.match(/^[^\/]*\.(jpg|jpeg|png|gif|webp)$/i)) {
+      return imageUrl;
+    }
+
+    try {
+      new URL(imageUrl);
+      return imageUrl;
+    } catch {
+      return this.placeholderImage;
+    }
   }
 
-  onImageError(event: Event): void {
+  isValidImageUrl(imageUrl: string): boolean {
+    if (!imageUrl || imageUrl.trim() === '') return false;
+    
+    if (imageUrl === this.placeholderImage) return true;
+    
+    try {
+      if (imageUrl.startsWith('http') || imageUrl.startsWith('https')) {
+        new URL(imageUrl);
+        return true;
+      }
+      return imageUrl.includes('.') && /\.(jpg|jpeg|png|gif|webp)$/i.test(imageUrl);
+    } catch {
+      return false;
+    }
+  }
+
+  onImageError(event: Event, tourId: string): void {
     const img = event.target as HTMLImageElement;
-    img.src = 'assets/images/placeholder.jpg';
+    
+    if (img.src === this.placeholderImage) return;
+    
+    console.warn(`Failed to load image for tour ${tourId}: ${img.src}`);
+    
+    img.src = this.placeholderImage;
+    img.alt = 'Изображение недоступно';
+    
+    this.imageLoadingStates.set(tourId, false);
+  }
+
+  onImageLoad(tourId: string): void {
+    this.imageLoadingStates.set(tourId, true);
+  }
+
+  isImageLoaded(tourId: string): boolean {
+    return this.imageLoadingStates.get(tourId) ?? false;
+  }
+
+  getImageClasses(tourId: string): string {
+    const baseClasses = 'tour-image';
+    const isLoaded = this.isImageLoaded(tourId);
+    return isLoaded ? `${baseClasses} loaded` : `${baseClasses} loading`;
+  }
+
+  preloadImage(imageUrl: string): Promise<boolean> {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(false);
+      img.src = imageUrl;
+    });
   }
 
   get isLoading(): boolean {

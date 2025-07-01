@@ -42,12 +42,22 @@ export class ToursService {
     return this.http.get<Tour>(`${this.apiUrl}/tour/${id}`);
   }
 
-  parseToursData(jsonString: string): ToursResponse {
+  parseToursData(data: any): ToursResponse {
     try {
-      return JSON.parse(jsonString);
+      // Если данные уже объект, возвращаем как есть
+      if (typeof data === 'object' && data !== null) {
+        return data as ToursResponse;
+      }
+      
+      // Если данные строка, парсим JSON
+      if (typeof data === 'string') {
+        return JSON.parse(data) as ToursResponse;
+      }
+      
+      throw new Error('Неподдерживаемый тип данных');
     } catch (error) {
       console.error('Ошибка парсинга данных туров:', error);
-      return { tours: [] };
+      throw error;
     }
   }
 

@@ -1,167 +1,155 @@
 <div class="tours-container">
-  <div class="container">
-    <div class="page-header">
-      <h1 class="page-title">Каталог туров</h1>
-      <p class="page-description">
-        Найдите идеальный тур для вашего путешествия
-      </p>
+  <div class="tours-header">
+    <h1>Туры</h1>
+    <div class="stats" *ngIf="!loading">
+      <span>Показано: {{ filteredCount }} из {{ totalTours }}</span>
+    </div>
+  </div>
+
+  <div class="filters-section">
+    <div class="search-filter">
+      <input
+        type="text"
+        placeholder="Поиск туров..."
+        [value]="searchTerm"
+        (input)="onSearchInput($event)"
+        class="search-input"
+      />
     </div>
 
-    <div class="filters-panel card">
-      <div class="filters-header">
-        <h3>Поиск и фильтры</h3>
-        <button class="btn btn-secondary" (click)="resetFilters()">
-          <i class="pi pi-refresh"></i>
-          Сбросить
+    <div class="filter-controls">
+      <select
+        [(ngModel)]="selectedType"
+        (change)="applyFilters()"
+        class="filter-select"
+      >
+        <option *ngFor="let type of tourTypes" [value]="type.value">
+          {{ type.label }}
+        </option>
+      </select>
+
+      <select
+        [(ngModel)]="selectedOperator"
+        (change)="applyFilters()"
+        class="filter-select"
+      >
+        <option value="">Все операторы</option>
+        <option *ngFor="let operator of tourOperators" [value]="operator">
+          {{ operator }}
+        </option>
+      </select>
+
+      <select
+        [(ngModel)]="sortBy"
+        (change)="applyFilters()"
+        class="filter-select"
+      >
+        <option value="">Без сортировки</option>
+        <option value="name">По названию</option>
+        <option value="price-asc">По цене (возрастание)</option>
+        <option value="price-desc">По цене (убывание)</option>
+        <option value="operator">По оператору</option>
+        <option value="date">По дате</option>
+      </select>
+
+      <button
+        *ngIf="hasActiveFilters()"
+        (click)="resetFilters()"
+        class="reset-button"
+      >
+        Сбросить фильтры
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Загрузка туров...</p>
+  </div>
+
+  <div *ngIf="hasError" class="error-state">
+    <div class="error-message">
+      <h3>Ошибка загрузки</h3>
+      <p>{{ error }}</p>
+      <button (click)="refreshTours()" class="retry-button">
+        Повторить попытку
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="showNoResults" class="no-results">
+    <div class="no-results-message">
+      <h3>Туры не найдены</h3>
+      <p *ngIf="hasActiveFilters()">
+        Попробуйте изменить параметры поиска или
+        <button (click)="resetFilters()" class="link-button">
+          сбросить фильтры
         </button>
-      </div>
-
-      <div class="filters-content">
-        <div class="filter-group">
-          <label class="form-label">Поиск по названию</label>
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Введите название тура или описание..."
-            [(ngModel)]="searchTerm"
-            (input)="applyFilters()"
-          />
-        </div>
-
-        <div class="filter-group">
-          <label class="form-label">Тип тура</label>
-          <select
-            class="form-control"
-            [(ngModel)]="selectedType"
-            (change)="applyFilters()"
-          >
-            @for (type of tourTypes; track type.value) {
-            <option [value]="type.value">{{ type.label }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label class="form-label">Туроператор</label>
-          <select
-            class="form-control"
-            [(ngModel)]="selectedOperator"
-            (change)="applyFilters()"
-          >
-            <option value="">Все операторы</option>
-            @for (operator of tourOperators; track operator) {
-            <option [value]="operator">{{ operator }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label class="form-label">Сортировка</label>
-          <select
-            class="form-control"
-            [(ngModel)]="sortBy"
-            (change)="applyFilters()"
-          >
-            <option value="">По умолчанию</option>
-            <option value="name">По названию</option>
-            <option value="price-asc">По цене (возрастание)</option>
-            <option value="price-desc">По цене (убывание)</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div class="results-info">
-      @if (loading) {
-      <div class="loading-message">
-        <i class="pi pi-spinner pi-spin"></i>
-        Загрузка туров...
-      </div>
-      } @else {
-      <p class="results-count">
-        Найдено туров: <strong>{{ filteredTours.length }}</strong> из
-        {{ tours.length }}
       </p>
-      }
+      <p *ngIf="!hasActiveFilters()">В настоящее время туры недоступны</p>
     </div>
+  </div>
 
-    <div class="tours-grid">
-      @if (loading) {
-      <div class="loading-placeholder">
-        @for (item of [1,2,3,4,5,6]; track item) {
-        <div class="tour-card-skeleton">
-          <div class="skeleton-image"></div>
-          <div class="skeleton-content">
-            <div class="skeleton-line"></div>
-            <div class="skeleton-line short"></div>
-            <div class="skeleton-line"></div>
-          </div>
+  <div *ngIf="hasResults" class="tours-grid">
+    <div
+      *ngFor="let tour of filteredTours; trackBy: trackByTourId"
+      class="tour-card"
+      (click)="navigateToTour(tour)"
+    >
+      <div class="tour-image-container">
+        <img
+          [src]="tour.img"
+          [alt]="tour.name"
+          [class]="getImageClasses(tour.id)"
+          (load)="onImageLoad(tour.id)"
+          (error)="onImageError($event, tour.id)"
+          loading="lazy"
+        />
+
+        <div *ngIf="!isImageLoaded(tour.id)" class="image-loading-overlay">
+          <div class="image-spinner"></div>
         </div>
-        }
+
+        <div class="price-badge">
+          {{ formatPrice(tour.price) }}
+        </div>
       </div>
-      } @else if (filteredTours.length === 0) {
-      <div class="no-results">
-        <i class="pi pi-search"></i>
-        <h3>Туры не найдены</h3>
-        <p>Попробуйте изменить параметры поиска или сбросить фильтры</p>
-        <button class="btn btn-primary" (click)="resetFilters()">
-          Показать все туры
-        </button>
-      </div>
-      } @else { @for (tour of filteredTours; track trackByTourId($index, tour))
-      {
-      <div class="tour-card" [routerLink]="['/tours', tour.id]">
-        <div class="tour-image">
-          <img
-            [src]="'assets/images/' + tour.img"
-            [alt]="tour.name"
-            onerror="this.src='assets/images/placeholder.jpg'"
-          />
-          @if (tour.type) {
-          <span class="tour-type-badge" [class]="'type-' + tour.type">
-            {{ tour.type === "single" ? "Одиночный" : "Групповой" }}
+
+      <div class="tour-content">
+        <h3 class="tour-name">{{ tour.name }}</h3>
+
+        <p class="tour-description" [title]="tour.description">
+          {{ tour.description }}
+        </p>
+
+        <div class="tour-meta">
+          <span class="tour-operator">
+            <i class="icon-building"></i>
+            {{ tour.tourOperator }}
           </span>
-          }
-        </div>
 
-        <div class="tour-content">
-          <h3 class="tour-title">{{ tour.name }}</h3>
+          <span *ngIf="tour.type" class="tour-type">
+            <i class="icon-tag"></i>
+            {{ getTourTypeLabel(tour.type) }}
+          </span>
 
-          <p class="tour-description">
-            {{
-              tour.description.length > 120
-                ? (tour.description | slice : 0 : 120) + "..."
-                : tour.description
-            }}
-          </p>
-
-          <div class="tour-meta">
-            <div class="tour-operator">
-              <i class="pi pi-building"></i>
-              <span>{{ tour.tourOperator }}</span>
-            </div>
-
-            @if (tour.date) {
-            <div class="tour-date">
-              <i class="pi pi-calendar"></i>
-              <span>{{ tour.date | date : "shortDate" }}</span>
-            </div>
-            }
-          </div>
-
-          <div class="tour-footer">
-            <div class="tour-price">
-              <span class="price-label">от</span>
-              <span class="price-amount">{{ tour.price }}</span>
-            </div>
-            <button class="btn btn-primary btn-sm">
-              <i class="pi pi-eye"></i>
-              Подробнее
-            </button>
-          </div>
+          <span *ngIf="tour.date" class="tour-date">
+            <i class="icon-calendar"></i>
+            {{ tour.date | date : "dd.MM.yyyy" }}
+          </span>
         </div>
       </div>
-      } }
+
+      <div class="tour-actions">
+        <button class="view-button">Подробнее</button>
+      </div>
     </div>
+  </div>
+
+  <div class="refresh-section" *ngIf="!loading">
+    <button (click)="refreshTours()" class="refresh-button">
+      <i class="icon-refresh"></i>
+      Обновить список туров
+    </button>
   </div>
 </div>

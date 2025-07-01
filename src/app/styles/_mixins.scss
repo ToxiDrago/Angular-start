@@ -1,3 +1,14 @@
+@use 'variables' as *;
+
+@mixin fade-in($duration: $transition-base) {
+  opacity: 0;
+  transition: opacity $duration;
+  
+  &.fade-in-active {
+    opacity: 1;
+  }
+}
+
 @mixin respond-to($breakpoint) {
   @if $breakpoint == xs {
     @media (max-width: #{$breakpoint-xs - 1px}) { @content; }
@@ -221,6 +232,32 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
+}
+
+@mixin loading-state {
+  position: relative;
+  opacity: 0.6;
+  pointer-events: none;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #ccc;
+    border-top-color: #333;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @mixin aspect-ratio($width: 16, $height: 9) {

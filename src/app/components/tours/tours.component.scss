@@ -1,7 +1,9 @@
-@import '../../styles/variables';
-@import '../../styles/mixins';
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
 
 .tours-container {
+  gap: $spacing-lg;
+  margin-bottom: $spacing-2xl;
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   padding: $spacing-lg 0;
@@ -346,3 +348,5 @@
     gap: $spacing-sm;
   }
 }
+
+
