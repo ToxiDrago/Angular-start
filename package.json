@@ -9,7 +9,9 @@
     "test": "ng test",
     "server": "node scripts/server.js",
     "dev": "concurrently \"npm run server\" \"npm run start\"",
-    "start:prod": "ng serve --prod"
+    "start:prod": "ng serve --configuration production",
+    "setup-data": "node scripts/setup-data.js",
+    "setup": "npm install && npm run setup-data"
   },
   "prettier": {
     "overrides": [

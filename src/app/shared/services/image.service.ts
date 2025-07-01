@@ -164,11 +164,11 @@ export class ImageService {
   }
 
   preloadImages(imageUrls: string[]): Observable<{ url: string; success: boolean }[]> {
-    const loadPromises = imageUrls.map(async (url) => {
-      const success = await this.preloadImage(url).toPromise();
-      return { url, success };
-    });
+  const loadPromises = imageUrls.map(async (url) => {
+    const success = (await this.preloadImage(url).toPromise()) ?? false;
+    return { url, success };
+  });
 
-    return from(Promise.all(loadPromises));
+  return from(Promise.all(loadPromises));
   }
 }

@@ -1,121 +1,179 @@
-@use '../../styles/variables' as *;
-@use '../../styles/mixins' as *;
+@use '../../styles/variables' as vars;
+@use '../../styles/mixins' as mixins;
 
 .tours-container {
-  gap: $spacing-lg;
-  margin-bottom: $spacing-2xl;
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  padding: $spacing-lg 0;
-  @include fade-in;
+  padding: vars.$spacing-lg 0;
+  gap: vars.$spacing-lg;
+  margin-bottom: vars.$spacing-2xl;
+  @include mixins.fade-in-animation;
 
   .container {
-    @include container;
+    @include mixins.container;
   }
 }
 
-.page-header {
+.tours-header {
   text-align: center;
-  margin-bottom: $spacing-2xl;
+  margin-bottom: vars.$spacing-2xl;
   
-  .page-title {
-    @include page-title;
-    background: $primary-gradient;
+  h1 {
+    @include mixins.page-title;
+    background: vars.$primary-gradient;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: $spacing-base;
+    margin-bottom: vars.$spacing-base;
   }
   
-  .page-description {
-    font-size: $font-size-lg;
-    color: $gray-600;
+  .stats {
+    font-size: vars.$font-size-lg;
+    color: vars.$gray-600;
     margin: 0;
-    font-weight: $font-weight-normal;
+    font-weight: vars.$font-weight-normal;
   }
 }
 
-.filters-panel {
-  @include card-base;
-  margin-bottom: $spacing-xl;
+.filters-section {
+  @include mixins.card-base;
+  margin-bottom: vars.$spacing-xl;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: vars.$spacing-lg;
   
-  .filters-header {
-    @include flex-between;
-    margin-bottom: $spacing-lg;
-    padding-bottom: $spacing-base;
-    border-bottom: 2px solid $gray-200;
+  .search-filter {
+    margin-bottom: vars.$spacing-lg;
     
-    h3 {
-      @include section-title;
-      margin: 0;
-      color: $gray-800;
+    .search-input {
+      @include mixins.form-control;
+      background: rgba(255, 255, 255, 0.8);
+      
+      &:focus {
+        background: vars.$white;
+        transform: translateY(-1px);
+      }
     }
   }
   
-  .filters-content {
-    @include grid-responsive(1, 2, 4);
-    gap: $spacing-lg;
+  .filter-controls {
+    // Move all properties before nested selectors
+    gap: vars.$spacing-lg;
+    align-items: end;
+    @include mixins.grid-responsive(1, 2, 4);
     
-    .filter-group {
-      .form-label {
-        display: block;
-        margin-bottom: $spacing-sm;
-        font-size: $font-size-sm;
-        font-weight: $font-weight-semibold;
-        color: $gray-700;
-      }
+    .filter-select {
+      @include mixins.form-control;
+      background: rgba(255, 255, 255, 0.8);
       
-      .form-control {
-        @include form-control;
-        background: rgba(255, 255, 255, 0.8);
-        
-        &:focus {
-          background: $white;
-          transform: translateY(-1px);
-        }
+      &:focus {
+        background: vars.$white;
+        transform: translateY(-1px);
       }
+    }
+    
+    .reset-button {
+      @include mixins.button-variant(vars.$gray-600, vars.$gray-700);
+      white-space: nowrap;
     }
   }
 }
 
-.results-info {
-  margin-bottom: $spacing-lg;
-  @include flex-between;
+.loading-state {
+  @include mixins.flex-center;
+  @include mixins.flex-column;
+  padding: vars.$spacing-2xl;
+  color: vars.$gray-600;
   
-  .loading-message {
-    @include flex-center;
-    gap: $spacing-sm;
-    color: $primary-color;
-    font-weight: $font-weight-medium;
-    
-    i {
-      font-size: $font-size-lg;
-    }
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid vars.$gray-200;
+    border-top: 4px solid vars.$primary-color;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: vars.$spacing-base;
   }
   
-  .results-count {
-    font-size: $font-size-base;
-    color: $gray-700;
+  p {
     margin: 0;
+    font-size: vars.$font-size-base;
+  }
+}
+
+.error-state {
+  @include mixins.error-state;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: vars.$border-radius-lg;
+  margin: vars.$spacing-2xl 0;
+  
+  .error-message {
+    text-align: center;
     
-    strong {
-      color: $primary-color;
-      font-weight: $font-weight-bold;
+    h3 {
+      color: vars.$gray-800;
+      font-size: vars.$font-size-xl;
+      margin-bottom: vars.$spacing-sm;
+    }
+    
+    p {
+      color: vars.$gray-600;
+      font-size: vars.$font-size-base;
+      margin-bottom: vars.$spacing-lg;
+    }
+    
+    .retry-button {
+      @include mixins.button-variant(vars.$primary-color, vars.$primary-dark);
+    }
+  }
+}
+
+.no-results {
+  @include mixins.error-state;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: vars.$border-radius-lg;
+  margin: vars.$spacing-2xl 0;
+  
+  .no-results-message {
+    text-align: center;
+    
+    h3 {
+      color: vars.$gray-800;
+      font-size: vars.$font-size-xl;
+      margin-bottom: vars.$spacing-sm;
+    }
+    
+    p {
+      color: vars.$gray-600;
+      font-size: vars.$font-size-base;
+      margin-bottom: vars.$spacing-lg;
+    }
+    
+    .link-button {
+      background: none;
+      border: none;
+      color: vars.$primary-color;
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: inherit;
+      
+      &:hover {
+        color: vars.$primary-dark;
+      }
     }
   }
 }
 
 .tours-grid {
-  @include grid-responsive(1, 2, 3);
-  gap: $spacing-xl;
-  margin-bottom: $spacing-2xl;
+  // Move properties before nested selectors
+  gap: vars.$spacing-xl;
+  margin-bottom: vars.$spacing-2xl;
+  @include mixins.grid-responsive(1, 2, 3);
   
   .tour-card {
-    @include card-base;
-    @include card-hover;
+    @include mixins.card-base;
+    @include mixins.card-hover;
     padding: 0;
     cursor: pointer;
     text-decoration: none;
@@ -126,227 +184,175 @@
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    transition: all $transition-base;
-    @include slide-up;
+    transition: all vars.$transition-base;
+    @include mixins.slide-up;
     
     &:hover {
       transform: translateY(-8px) scale(1.02);
-      box-shadow: $shadow-xl;
-      border-color: rgba($primary-color, 0.3);
+      box-shadow: vars.$shadow-xl;
+      border-color: rgba(vars.$primary-color, 0.3);
     }
     
-    .tour-image {
+    .tour-image-container {
       position: relative;
-      height: $tour-image-height;
+      height: vars.$tour-image-height;
       overflow: hidden;
-      border-radius: $border-radius-md $border-radius-md 0 0;
+      border-radius: vars.$border-radius-md vars.$border-radius-md 0 0;
       
       img {
-        @include image-cover;
-        transition: transform $transition-slow;
+        @include mixins.image-cover;
+        transition: transform vars.$transition-slow;
+        
+        &.loading {
+          opacity: 0.7;
+        }
+        
+        &.loaded {
+          opacity: 1;
+        }
       }
       
       &:hover img {
         transform: scale(1.1);
       }
       
-      .tour-type-badge {
+      .image-loading-overlay {
         position: absolute;
-        top: $spacing-sm;
-        right: $spacing-sm;
-        @include badge-base;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.8);
+        @include mixins.flex-center;
+        
+        .image-spinner {
+          width: 30px;
+          height: 30px;
+          border: 3px solid vars.$gray-200;
+          border-top: 3px solid vars.$primary-color;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+      }
+      
+      .price-badge {
+        position: absolute;
+        top: vars.$spacing-sm;
+        right: vars.$spacing-sm;
+        @include mixins.badge-base;
+        background: rgba(vars.$primary-color, 0.9);
+        color: vars.$white;
         backdrop-filter: blur(10px);
-        font-weight: $font-weight-semibold;
-        
-        &.type-single {
-          background: rgba($tour-single-color, 0.9);
-          color: $white;
-        }
-        
-        &.type-multi {
-          background: rgba($tour-multi-color, 0.9);
-          color: $white;
-        }
+        font-weight: vars.$font-weight-bold;
+        font-size: vars.$font-size-sm;
       }
     }
     
     .tour-content {
-      padding: $spacing-lg;
+      padding: vars.$spacing-lg;
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: $spacing-base;
+      gap: vars.$spacing-base;
       
-      .tour-title {
-        @include card-title;
-        @include text-clamp(2);
-        margin-bottom: $spacing-sm;
-        color: $gray-900;
-        font-size: $font-size-xl;
+      .tour-name {
+        @include mixins.card-title;
+        @include mixins.text-clamp(2);
+        margin-bottom: vars.$spacing-sm;
+        color: vars.$gray-900;
+        font-size: vars.$font-size-xl;
       }
       
       .tour-description {
-        @include text-clamp(3);
-        color: $gray-600;
-        font-size: $font-size-sm;
-        line-height: $line-height-relaxed;
+        @include mixins.text-clamp(3);
+        color: vars.$gray-600;
+        font-size: vars.$font-size-sm;
+        line-height: vars.$line-height-relaxed;
         flex: 1;
-        margin-bottom: $spacing-base;
+        margin-bottom: vars.$spacing-base;
       }
       
       .tour-meta {
         display: flex;
         flex-direction: column;
-        gap: $spacing-sm;
-        margin-bottom: $spacing-base;
+        gap: vars.$spacing-sm;
+        margin-bottom: vars.$spacing-base;
         
         .tour-operator,
+        .tour-type,
         .tour-date {
           display: flex;
           align-items: center;
-          gap: $spacing-sm;
-          font-size: $font-size-sm;
-          color: $gray-600;
-          font-weight: $font-weight-medium;
-          
-          i {
-            color: $primary-color;
-            font-size: $font-size-base;
-          }
+          gap: vars.$spacing-sm;
+          font-size: vars.$font-size-sm;
+          color: vars.$gray-600;
+          font-weight: vars.$font-weight-medium;
         }
       }
+    }
+    
+    .tour-actions {
+      padding: 0 vars.$spacing-lg vars.$spacing-lg;
       
-      .tour-footer {
-        @include flex-between;
-        margin-top: auto;
-        padding-top: $spacing-base;
-        border-top: 2px solid $gray-200;
+      .view-button {
+        @include mixins.button-variant(vars.$primary-color, vars.$primary-dark);
+        width: 100%;
+        font-size: vars.$font-size-sm;
         
-        .tour-price {
-          display: flex;
-          flex-direction: column;
-          
-          .price-label {
-            font-size: $font-size-xs;
-            color: $gray-500;
-            line-height: 1;
-            font-weight: $font-weight-medium;
-          }
-          
-          .price-amount {
-            font-size: $font-size-xl;
-            font-weight: $font-weight-bold;
-            color: $primary-color;
-            line-height: 1.2;
-          }
-        }
-        
-        .btn {
-          @include button-base;
-          @include button-variant($primary-color, $primary-dark);
-          font-size: $font-size-sm;
-          
-          &:hover {
-            transform: translateY(-2px);
-          }
+        &:hover {
+          transform: translateY(-2px);
         }
       }
     }
   }
 }
 
-.loading-placeholder {
-  @include grid-responsive(1, 2, 3);
-  gap: $spacing-xl;
+.refresh-section {
+  text-align: center;
+  margin-top: vars.$spacing-xl;
   
-  .tour-card-skeleton {
-    @include card-base;
-    padding: 0;
-    height: $tour-card-height;
+  .refresh-button {
+    @include mixins.button-variant(vars.$gray-600, vars.$gray-700);
     
-    .skeleton-image {
-      @include loading-skeleton;
-      height: $tour-image-height;
-      border-radius: $border-radius-md $border-radius-md 0 0;
-    }
-    
-    .skeleton-content {
-      padding: $spacing-lg;
-      
-      .skeleton-line {
-        @include loading-skeleton;
-        height: 1.2rem;
-        margin-bottom: $spacing-base;
-        border-radius: $border-radius-sm;
-        
-        &:nth-child(1) { width: 80%; }
-        &:nth-child(2) { width: 100%; }
-        &:nth-child(3) { width: 60%; }
-        &:nth-child(4) { width: 40%; }
-        
-        &:last-child {
-          margin-bottom: 0;
-        }
-      }
+    &:hover {
+      transform: translateY(-2px);
     }
   }
 }
 
-.no-results {
-  @include error-state;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: $border-radius-lg;
-  margin: $spacing-2xl 0;
-  
-  i {
-    color: $primary-color;
-    font-size: $font-size-4xl;
-  }
-  
-  h3 {
-    color: $gray-800;
-    font-size: $font-size-2xl;
-  }
-  
-  p {
-    color: $gray-600;
-    font-size: $font-size-base;
-  }
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 // Responsive adjustments
-@include respond-to(md) {
+@include mixins.respond-to(md) {
   .tours-grid {
-    gap: $spacing-lg;
+    gap: vars.$spacing-lg;
   }
   
-  .filters-content {
+  .filters-section .filter-controls {
     grid-template-columns: 1fr;
-    gap: $spacing-base;
-  }
-  
-  .page-header .page-title {
-    font-size: $font-size-2xl;
+    gap: vars.$spacing-base;
   }
 }
 
-@include respond-to(xs) {
+@include mixins.respond-to(xs) {
   .tours-container {
-    padding: $spacing-base 0;
+    padding: vars.$spacing-base 0;
   }
   
-  .page-header {
-    margin-bottom: $spacing-lg;
+  .tours-header {
+    margin-bottom: vars.$spacing-lg;
   }
   
-  .filters-panel {
-    margin-bottom: $spacing-lg;
+  .filters-section {
+    margin-bottom: vars.$spacing-lg;
+    padding: vars.$spacing-base;
   }
   
   .tour-card .tour-content {
-    padding: $spacing-base;
-    gap: $spacing-sm;
+    padding: vars.$spacing-base;
+    gap: vars.$spacing-sm;
   }
 }
-
-

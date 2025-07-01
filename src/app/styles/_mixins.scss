@@ -1,6 +1,6 @@
-@use 'variables' as *;
+@use './variables' as vars;
 
-@mixin fade-in($duration: $transition-base) {
+@mixin fade-in($duration: vars.$transition-base) {
   opacity: 0;
   transition: opacity $duration;
   
@@ -11,29 +11,29 @@
 
 @mixin respond-to($breakpoint) {
   @if $breakpoint == xs {
-    @media (max-width: #{$breakpoint-xs - 1px}) { @content; }
+    @media (max-width: #{vars.$breakpoint-xs - 1px}) { @content; }
   }
   @if $breakpoint == sm {
-    @media (min-width: #{$breakpoint-sm}) { @content; }
+    @media (min-width: #{vars.$breakpoint-sm}) { @content; }
   }
   @if $breakpoint == md {
-    @media (min-width: #{$breakpoint-md}) { @content; }
+    @media (min-width: #{vars.$breakpoint-md}) { @content; }
   }
   @if $breakpoint == lg {
-    @media (min-width: #{$breakpoint-lg}) { @content; }
+    @media (min-width: #{vars.$breakpoint-lg}) { @content; }
   }
   @if $breakpoint == xl {
-    @media (min-width: #{$breakpoint-xl}) { @content; }
+    @media (min-width: #{vars.$breakpoint-xl}) { @content; }
   }
 }
 
-@mixin container($max-width: $container-xl) {
+@mixin container($max-width: vars.$container-xl) {
   max-width: $max-width;
   margin: 0 auto;
-  padding: 0 $spacing-base;
+  padding: 0 vars.$spacing-base;
   
   @include respond-to(sm) {
-    padding: 0 $spacing-lg;
+    padding: 0 vars.$spacing-lg;
   }
 }
 
@@ -58,16 +58,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: $spacing-sm;
-  padding: $spacing-md $spacing-base;
+  gap: vars.$spacing-sm;
+  padding: vars.$spacing-md vars.$spacing-base;
   border: none;
-  border-radius: $border-radius-base;
-  font-family: $font-family-base;
-  font-size: $font-size-sm;
-  font-weight: $font-weight-medium;
+  border-radius: vars.$border-radius-base;
+  font-family: vars.$font-family-base;
+  font-size: vars.$font-size-sm;
+  font-weight: vars.$font-weight-medium;
   text-decoration: none;
   cursor: pointer;
-  transition: all $transition-base;
+  transition: all vars.$transition-base;
   white-space: nowrap;
   
   &:disabled {
@@ -76,15 +76,19 @@
   }
 }
 
-@mixin button-variant($bg-color, $hover-color: null, $text-color: $white) {
+@mixin button-variant($bg-color, $hover-color: null, $text-color: vars.$white) {
   @include button-base;
   background-color: $bg-color;
   color: $text-color;
   
   &:hover:not(:disabled) {
-    background-color: $hover-color or darken($bg-color, 10%);
+    @if $hover-color {
+      background-color: $hover-color;
+    } @else {
+      filter: brightness(0.9);
+    }
     transform: translateY(-2px);
-    box-shadow: $shadow-md;
+    box-shadow: vars.$shadow-md;
   }
   
   &:active {
@@ -93,83 +97,83 @@
 }
 
 @mixin button-sm {
-  padding: $spacing-sm $spacing-md;
-  font-size: $font-size-xs;
+  padding: vars.$spacing-sm vars.$spacing-md;
+  font-size: vars.$font-size-xs;
 }
 
 @mixin button-lg {
-  padding: $spacing-base $spacing-xl;
-  font-size: $font-size-base;
-  font-weight: $font-weight-semibold;
+  padding: vars.$spacing-base vars.$spacing-xl;
+  font-size: vars.$font-size-base;
+  font-weight: vars.$font-weight-semibold;
 }
 
 @mixin card-base {
-  background: $white;
-  border-radius: $border-radius-md;
-  box-shadow: $shadow-base;
+  background: vars.$white;
+  border-radius: vars.$border-radius-md;
+  box-shadow: vars.$shadow-base;
   overflow: hidden;
-  transition: all $transition-base;
+  transition: all vars.$transition-base;
 }
 
 @mixin card-hover {
   &:hover {
     transform: translateY(-4px);
-    box-shadow: $shadow-lg;
+    box-shadow: vars.$shadow-lg;
   }
 }
 
 @mixin form-control {
   width: 100%;
-  padding: $spacing-md;
-  border: 1px solid $gray-300;
-  border-radius: $border-radius-base;
-  font-family: $font-family-base;
-  font-size: $font-size-sm;
-  background-color: $white;
-  transition: all $transition-base;
+  padding: vars.$spacing-md;
+  border: 1px solid vars.$gray-300;
+  border-radius: vars.$border-radius-base;
+  font-family: vars.$font-family-base;
+  font-size: vars.$font-size-sm;
+  background-color: vars.$white;
+  transition: all vars.$transition-base;
   
   &:focus {
     outline: none;
-    border-color: $primary-color;
-    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+    border-color: vars.$primary-color;
+    box-shadow: 0 0 0 3px rgba(vars.$primary-color, 0.1);
   }
   
   &:disabled {
-    background-color: $gray-100;
+    background-color: vars.$gray-100;
     cursor: not-allowed;
   }
   
   &::placeholder {
-    color: $gray-500;
+    color: vars.$gray-500;
   }
 }
 
 @mixin page-title {
-  font-size: $font-size-3xl;
-  font-weight: $font-weight-bold;
-  color: $gray-900;
-  margin: 0 0 $spacing-base 0;
-  line-height: $line-height-tight;
+  font-size: vars.$font-size-3xl;
+  font-weight: vars.$font-weight-bold;
+  color: vars.$gray-900;
+  margin: 0 0 vars.$spacing-base 0;
+  line-height: vars.$line-height-tight;
 }
 
 @mixin section-title {
-  font-size: $font-size-xl;
-  font-weight: $font-weight-semibold;
-  color: $gray-800;
-  margin: 0 0 $spacing-md 0;
-  line-height: $line-height-normal;
+  font-size: vars.$font-size-xl;
+  font-weight: vars.$font-weight-semibold;
+  color: vars.$gray-800;
+  margin: 0 0 vars.$spacing-md 0;
+  line-height: vars.$line-height-normal;
 }
 
 @mixin card-title {
-  font-size: $font-size-lg;
-  font-weight: $font-weight-semibold;
-  color: $gray-900;
-  margin: 0 0 $spacing-sm 0;
-  line-height: $line-height-tight;
+  font-size: vars.$font-size-lg;
+  font-weight: vars.$font-weight-semibold;
+  color: vars.$gray-900;
+  margin: 0 0 vars.$spacing-sm 0;
+  line-height: vars.$line-height-tight;
 }
 
 @mixin loading-skeleton {
-  background: linear-gradient(90deg, $gray-200 25%, $gray-100 50%, $gray-200 75%);
+  background: linear-gradient(90deg, vars.$gray-200 25%, vars.$gray-100 50%, vars.$gray-200 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
 }
@@ -182,21 +186,21 @@
 @mixin badge-base {
   display: inline-flex;
   align-items: center;
-  gap: $spacing-xs;
-  padding: $spacing-xs $spacing-sm;
-  font-size: $font-size-xs;
-  font-weight: $font-weight-medium;
-  border-radius: $border-radius-full;
+  gap: vars.$spacing-xs;
+  padding: vars.$spacing-xs vars.$spacing-sm;
+  font-size: vars.$font-size-xs;
+  font-weight: vars.$font-weight-medium;
+  border-radius: vars.$border-radius-full;
   white-space: nowrap;
 }
 
-@mixin badge-variant($bg-color, $text-color: $white) {
+@mixin badge-variant($bg-color, $text-color: vars.$white) {
   @include badge-base;
   background-color: $bg-color;
   color: $text-color;
 }
 
-@mixin grid($columns: 1, $gap: $spacing-base) {
+@mixin grid($columns: 1, $gap: vars.$spacing-base) {
   display: grid;
   grid-template-columns: repeat($columns, 1fr);
   gap: $gap;
@@ -286,26 +290,26 @@
   @include flex-column;
   align-items: center;
   text-align: center;
-  padding: $spacing-2xl;
-  color: $gray-600;
+  padding: vars.$spacing-2xl;
+  color: vars.$gray-600;
   
   i {
-    font-size: $font-size-4xl;
-    color: $gray-400;
-    margin-bottom: $spacing-base;
+    font-size: vars.$font-size-4xl;
+    color: vars.$gray-400;
+    margin-bottom: vars.$spacing-base;
   }
   
   h2, h3 {
-    color: $gray-700;
-    margin-bottom: $spacing-sm;
+    color: vars.$gray-700;
+    margin-bottom: vars.$spacing-sm;
   }
   
   p {
-    margin-bottom: $spacing-lg;
+    margin-bottom: vars.$spacing-lg;
   }
 }
 
-@mixin fade-in($duration: $transition-base) {
+@mixin fade-in-animation($duration: vars.$transition-base) {
   animation: fadeIn $duration ease-in-out;
 }
 
@@ -314,7 +318,7 @@
   to { opacity: 1; }
 }
 
-@mixin slide-up($duration: $transition-base) {
+@mixin slide-up($duration: vars.$transition-base) {
   animation: slideUp $duration ease-out;
 }
 

@@ -1,22 +1,16 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { ToursService, Tour, ToursResponse } from '../../shared/services/tours.service';
 import { NotificationService } from '../../shared/services/notification.service';
-
-interface FilterState {
-  searchTerm: string;
-  selectedType: string;
-  selectedOperator: string;
-  sortBy: string;
-}
+import { ImageService } from '../../shared/services/image.service';
 
 @Component({
   selector: 'app-tours',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './tours.component.html',
   styleUrls: ['./tours.component.scss']
 })
@@ -44,12 +38,10 @@ export class ToursComponent implements OnInit, OnDestroy {
   totalTours = 0;
   filteredCount = 0;
 
-  private placeholderImage = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNzUgMTI1SDE4NVYxMzVIMTc1VjEyNVoiIGZpbGw9IiM5Q0EzQUYiLz4KPHA=">';
-  private imageLoadingStates = new Map<string, boolean>();
-
   constructor(
     private toursService: ToursService,
     private notificationService: NotificationService,
+    private imageService: ImageService,
     private router: Router
   ) {
     this.searchSubject.pipe(
@@ -86,7 +78,7 @@ export class ToursComponent implements OnInit, OnDestroy {
 
           this.tours = toursData.tours.map(tour => ({
             ...tour,
-            img: this.getValidImageUrl(tour.img)
+            img: this.processImageUrl(tour.img)
           }));
           
           this.filteredTours = [...this.tours];
@@ -119,6 +111,44 @@ export class ToursComponent implements OnInit, OnDestroy {
     });
   }
 
+  processImageUrl(imageUrl: string): string {
+    if (!imageUrl) {
+      return this.imageService.getPlaceholder('landscape');
+    }
+    
+    // If it's just a filename, prepend assets path
+    if (!imageUrl.includes('/') && imageUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+      return `assets/images/${imageUrl}`;
+    }
+    
+    return this.imageService.processImageUrl(imageUrl);
+  }
+
+  onImageError(event: Event, tourId: string): void {
+    const img = event.target as HTMLImageElement;
+    const fallbackUrl = this.imageService.getFallbackUrl(img.src);
+    
+    if (img.src !== fallbackUrl) {
+      console.warn(`Failed to load image for tour ${tourId}: ${img.src}`);
+      img.src = fallbackUrl;
+      img.alt = 'Изображение недоступно';
+    }
+  }
+
+  onImageLoad(tourId: string): void {
+    // Image loaded successfully
+  }
+
+  isImageLoaded(tourId: string): boolean {
+    const tour = this.tours.find(t => t.id === tourId);
+    return tour ? this.imageService.isImageLoaded(tour.img) : false;
+  }
+
+  getImageClasses(tourId: string): string {
+    return 'tour-image';
+  }
+
+  // ... rest of your existing methods remain the same
   onSearchInput(event: Event): void {
     const target = event.target as HTMLInputElement;
     this.searchSubject.next(target.value);
@@ -185,27 +215,15 @@ export class ToursComponent implements OnInit, OnDestroy {
     this.filteredCount = this.tours.length;
   }
 
-  getFilterState(): FilterState {
-    return {
-      searchTerm: this.searchTerm,
-      selectedType: this.selectedType,
-      selectedOperator: this.selectedOperator,
-      sortBy: this.sortBy
-    };
-  }
-
   hasActiveFilters(): boolean {
-    const state = this.getFilterState();
-    return Object.values(state).some(value => value.trim() !== '');
+    return this.searchTerm.trim() !== '' || 
+           this.selectedType !== '' || 
+           this.selectedOperator !== '' || 
+           this.sortBy !== '';
   }
 
   navigateToTour(tour: Tour): void {
-    this.router.navigate(['/tours', tour.id], {
-      queryParams: {
-        from: 'tours-list',
-        ...this.getFilterState()
-      }
-    });
+    this.router.navigate(['/tours', tour.id]);
   }
 
   refreshTours(): void {
@@ -222,77 +240,7 @@ export class ToursComponent implements OnInit, OnDestroy {
   }
 
   formatPrice(price: string): string {
-    const numericPrice = price.replace(/[^\d,.-]/g, '');
-    return numericPrice || price;
-  }
-
-  getValidImageUrl(imageUrl: string): string {
-    if (!imageUrl || imageUrl.trim() === '') {
-      return this.placeholderImage;
-    }
-
-    if (imageUrl.startsWith('assets/') || imageUrl.match(/^[^\/]*\.(jpg|jpeg|png|gif|webp)$/i)) {
-      return imageUrl;
-    }
-
-    try {
-      new URL(imageUrl);
-      return imageUrl;
-    } catch {
-      return this.placeholderImage;
-    }
-  }
-
-  isValidImageUrl(imageUrl: string): boolean {
-    if (!imageUrl || imageUrl.trim() === '') return false;
-    
-    if (imageUrl === this.placeholderImage) return true;
-    
-    try {
-      if (imageUrl.startsWith('http') || imageUrl.startsWith('https')) {
-        new URL(imageUrl);
-        return true;
-      }
-      return imageUrl.includes('.') && /\.(jpg|jpeg|png|gif|webp)$/i.test(imageUrl);
-    } catch {
-      return false;
-    }
-  }
-
-  onImageError(event: Event, tourId: string): void {
-    const img = event.target as HTMLImageElement;
-    
-    if (img.src === this.placeholderImage) return;
-    
-    console.warn(`Failed to load image for tour ${tourId}: ${img.src}`);
-    
-    img.src = this.placeholderImage;
-    img.alt = 'Изображение недоступно';
-    
-    this.imageLoadingStates.set(tourId, false);
-  }
-
-  onImageLoad(tourId: string): void {
-    this.imageLoadingStates.set(tourId, true);
-  }
-
-  isImageLoaded(tourId: string): boolean {
-    return this.imageLoadingStates.get(tourId) ?? false;
-  }
-
-  getImageClasses(tourId: string): string {
-    const baseClasses = 'tour-image';
-    const isLoaded = this.isImageLoaded(tourId);
-    return isLoaded ? `${baseClasses} loaded` : `${baseClasses} loading`;
-  }
-
-  preloadImage(imageUrl: string): Promise<boolean> {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => resolve(true);
-      img.onerror = () => resolve(false);
-      img.src = imageUrl;
-    });
+    return price.replace(/[^\d,.-€]/g, '') || price;
   }
 
   get isLoading(): boolean {

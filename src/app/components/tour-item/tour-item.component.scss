@@ -1,116 +1,118 @@
-@use '../../styles/variables' as *;
-@use '../../styles/mixins' as *;
+@use '../../styles/variables' as vars;
+@use '../../styles/mixins' as mixins;
 
 .tour-item-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: $spacing-lg 0;
-  @include fade-in;
+  padding: vars.$spacing-lg 0;
+  @include mixins.fade-in-animation;
 
   .container {
-    @include container;
+    @include mixins.container;
   }
 }
 
 .loading-state {
-  @include loading-state;
+  @include mixins.flex-center;
+  @include mixins.flex-column;
   background: rgba(255, 255, 255, 0.95);
-  border-radius: $border-radius-lg;
-  margin: $spacing-2xl auto;
+  border-radius: vars.$border-radius-lg;
+  margin: vars.$spacing-2xl auto;
   max-width: 400px;
   backdrop-filter: blur(10px);
+  padding: vars.$spacing-2xl;
   
   i {
-    font-size: $font-size-3xl;
-    color: $primary-color;
-    margin-bottom: $spacing-base;
+    font-size: vars.$font-size-3xl;
+    color: vars.$primary-color;
+    margin-bottom: vars.$spacing-base;
   }
   
   p {
-    font-size: $font-size-base;
-    color: $gray-700;
+    font-size: vars.$font-size-base;
+    color: vars.$gray-700;
     margin: 0;
   }
 }
 
 .error-state {
-  @include error-state;
+  @include mixins.error-state;
   background: rgba(255, 255, 255, 0.95);
-  border-radius: $border-radius-lg;
-  margin: $spacing-2xl auto;
+  border-radius: vars.$border-radius-lg;
+  margin: vars.$spacing-2xl auto;
   max-width: 500px;
   backdrop-filter: blur(10px);
   
   i {
-    color: $danger-color;
-    font-size: $font-size-4xl;
-    margin-bottom: $spacing-base;
+    color: vars.$danger-color;
+    font-size: vars.$font-size-4xl;
+    margin-bottom: vars.$spacing-base;
   }
   
   h2 {
-    color: $gray-800;
-    font-size: $font-size-2xl;
-    margin-bottom: $spacing-sm;
+    color: vars.$gray-800;
+    font-size: vars.$font-size-2xl;
+    margin-bottom: vars.$spacing-sm;
   }
   
   p {
-    color: $gray-600;
-    font-size: $font-size-base;
-    margin-bottom: $spacing-lg;
+    color: vars.$gray-600;
+    font-size: vars.$font-size-base;
+    margin-bottom: vars.$spacing-lg;
   }
   
   .error-actions {
-    @include flex-center;
-    gap: $spacing-base;
+    @include mixins.flex-center;
+    gap: vars.$spacing-base;
   }
 }
 
 .tour-detail {
   background: rgba(255, 255, 255, 0.95);
-  border-radius: $border-radius-xl;
+  border-radius: vars.$border-radius-xl;
   overflow: hidden;
-  box-shadow: $shadow-xl;
+  box-shadow: vars.$shadow-xl;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  @include slide-up;
+  @include mixins.slide-up;
 }
 
 .tour-header {
-  @include flex-between;
-  padding: $spacing-lg $spacing-xl;
-  background: linear-gradient(135deg, rgba($primary-color, 0.1) 0%, rgba($secondary-color, 0.1) 100%);
-  border-bottom: 2px solid rgba($primary-color, 0.1);
+  @include mixins.flex-between;
+  padding: vars.$spacing-lg vars.$spacing-xl;
+  background: linear-gradient(135deg, rgba(vars.$primary-color, 0.1) 0%, rgba(vars.$secondary-color, 0.1) 100%);
+  border-bottom: 2px solid rgba(vars.$primary-color, 0.1);
   
   .back-btn {
-    @include button-base;
-    background: rgba($gray-600, 0.1);
-    color: $gray-700;
-    border: 1px solid rgba($gray-600, 0.2);
-    transition: all $transition-base;
+    @include mixins.button-base;
+    background: rgba(vars.$gray-600, 0.1);
+    color: vars.$gray-700;
+    border: 1px solid rgba(vars.$gray-600, 0.2);
+    transition: all vars.$transition-base;
     
     &:hover {
-      background: $gray-600;
-      color: $white;
+      background: vars.$gray-600;
+      color: vars.$white;
       transform: translateX(-4px);
     }
   }
   
   .tour-badges {
     display: flex;
-    gap: $spacing-sm;
+    gap: vars.$spacing-sm;
     
     .badge {
-      @include badge-base;
-      font-weight: $font-weight-semibold;
+      @include mixins.badge-base;
+      font-weight: vars.$font-weight-semibold;
       
       &.badge-single {
-        background: $tour-single-color;
-        color: $white;
+        background: vars.$tour-single-color;
+        color: vars.$white;
       }
       
       &.badge-multi {
-        background: $tour-multi-color;
-        color: $white;
+        background: vars.$tour-multi-color;
+        color: vars.$white;
       }
     }
   }
@@ -119,11 +121,11 @@
 .tour-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: $spacing-2xl;
+  gap: vars.$spacing-2xl;
   
-  @include respond-to(md) {
+  @include mixins.respond-to(md) {
     grid-template-columns: 1fr;
-    gap: $spacing-xl;
+    gap: vars.$spacing-xl;
   }
 }
 
@@ -133,10 +135,10 @@
   .tour-main-image {
     width: 100%;
     height: 400px;
-    @include image-cover;
-    border-radius: $border-radius-lg;
-    box-shadow: $shadow-lg;
-    transition: transform $transition-base;
+    @include mixins.image-cover;
+    border-radius: vars.$border-radius-lg;
+    box-shadow: vars.$shadow-lg;
+    transition: transform vars.$transition-base;
     
     &:hover {
       transform: scale(1.02);
@@ -145,38 +147,38 @@
 }
 
 .tour-info-section {
-  padding: $spacing-xl;
+  padding: vars.$spacing-xl;
   display: flex;
   flex-direction: column;
-  gap: $spacing-lg;
+  gap: vars.$spacing-lg;
 }
 
 .tour-title {
-  @include page-title;
-  background: $primary-gradient;
+  @include mixins.page-title;
+  background: vars.$primary-gradient;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: $spacing-base;
-  line-height: $line-height-tight;
+  margin-bottom: vars.$spacing-base;
+  line-height: vars.$line-height-tight;
 }
 
 .tour-meta {
   display: flex;
   flex-direction: column;
-  gap: $spacing-base;
+  gap: vars.$spacing-base;
   
   .meta-item {
     display: flex;
     align-items: center;
-    gap: $spacing-base;
-    font-size: $font-size-base;
-    color: $gray-700;
-    font-weight: $font-weight-medium;
+    gap: vars.$spacing-base;
+    font-size: vars.$font-size-base;
+    color: vars.$gray-700;
+    font-weight: vars.$font-weight-medium;
     
     i {
-      color: $primary-color;
-      font-size: $font-size-lg;
+      color: vars.$primary-color;
+      font-size: vars.$font-size-lg;
       width: 24px;
       text-align: center;
     }
@@ -185,9 +187,9 @@
 
 .tour-description {
   h3 {
-    @include section-title;
-    color: $gray-800;
-    margin-bottom: $spacing-base;
+    @include mixins.section-title;
+    color: vars.$gray-800;
+    margin-bottom: vars.$spacing-base;
     position: relative;
     
     &::after {
@@ -197,45 +199,45 @@
       left: 0;
       width: 60px;
       height: 3px;
-      background: $primary-gradient;
-      border-radius: $border-radius-full;
+      background: vars.$primary-gradient;
+      border-radius: vars.$border-radius-full;
     }
   }
   
   p {
-    font-size: $font-size-base;
-    line-height: $line-height-relaxed;
-    color: $gray-700;
+    font-size: vars.$font-size-base;
+    line-height: vars.$line-height-relaxed;
+    color: vars.$gray-700;
     margin: 0;
     text-align: justify;
   }
 }
 
 .tour-pricing {
-  background: linear-gradient(135deg, rgba($primary-color, 0.05) 0%, rgba($secondary-color, 0.05) 100%);
-  padding: $spacing-xl;
-  border-radius: $border-radius-lg;
-  border: 2px solid rgba($primary-color, 0.1);
+  background: linear-gradient(135deg, rgba(vars.$primary-color, 0.05) 0%, rgba(vars.$secondary-color, 0.05) 100%);
+  padding: vars.$spacing-xl;
+  border-radius: vars.$border-radius-lg;
+  border: 2px solid rgba(vars.$primary-color, 0.1);
   margin-top: auto;
   
   .price-info {
     display: flex;
     flex-direction: column;
-    gap: $spacing-sm;
-    margin-bottom: $spacing-lg;
+    gap: vars.$spacing-sm;
+    margin-bottom: vars.$spacing-lg;
     text-align: center;
     
     .price-label {
-      font-size: $font-size-base;
-      color: $gray-600;
-      font-weight: $font-weight-medium;
+      font-size: vars.$font-size-base;
+      color: vars.$gray-600;
+      font-weight: vars.$font-weight-medium;
     }
     
     .price-amount {
-      font-size: $font-size-3xl;
-      font-weight: $font-weight-bold;
-      color: $primary-color;
-      background: $primary-gradient;
+      font-size: vars.$font-size-3xl;
+      font-weight: vars.$font-weight-bold;
+      color: vars.$primary-color;
+      background: vars.$primary-gradient;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -243,19 +245,18 @@
   }
   
   .btn-large {
-    @include button-base;
-    @include button-lg;
+    @include mixins.button-base;
+    @include mixins.button-lg;
     width: 100%;
-    background: $primary-gradient;
-    color: $white;
-    font-weight: $font-weight-semibold;
-    box-shadow: $shadow-md;
-    transition: all $transition-base;
+    background: vars.$primary-gradient;
+    color: vars.$white;
+    font-weight: vars.$font-weight-semibold;
+    box-shadow: vars.$shadow-md;
+    transition: all vars.$transition-base;
     
     &:hover {
       transform: translateY(-3px);
-      box-shadow: $shadow-xl;
-      background: linear-gradient(135deg, $primary-dark 0%, darken($secondary-color, 10%) 100%);
+      box-shadow: vars.$shadow-xl;
     }
     
     &:active {
@@ -264,7 +265,8 @@
   }
 }
 
-@include respond-to(lg) {
+// Responsive design
+@include mixins.respond-to(lg) {
   .tour-content {
     grid-template-columns: 1fr;
   }
@@ -274,24 +276,24 @@
   }
   
   .tour-info-section {
-    padding: $spacing-lg;
+    padding: vars.$spacing-lg;
   }
 }
 
-@include respond-to(md) {
+@include mixins.respond-to(md) {
   .tour-item-container {
-    padding: $spacing-base 0;
+    padding: vars.$spacing-base 0;
   }
   
   .tour-header {
-    padding: $spacing-base $spacing-lg;
+    padding: vars.$spacing-base vars.$spacing-lg;
     flex-direction: column;
-    gap: $spacing-base;
+    gap: vars.$spacing-base;
     text-align: center;
   }
   
   .tour-title {
-    font-size: $font-size-2xl;
+    font-size: vars.$font-size-2xl;
   }
   
   .tour-image-section .tour-main-image {
@@ -299,40 +301,25 @@
   }
   
   .tour-info-section {
-    padding: $spacing-base;
-    gap: $spacing-base;
+    padding: vars.$spacing-base;
+    gap: vars.$spacing-base;
   }
   
   .tour-pricing {
-    padding: $spacing-lg;
+    padding: vars.$spacing-lg;
   }
 }
 
-@include respond-to(xs) {
+@include mixins.respond-to(xs) {
   .tour-header {
-    padding: $spacing-base;
+    padding: vars.$spacing-base;
   }
   
   .tour-content {
-    gap: $spacing-lg;
+    gap: vars.$spacing-lg;
   }
   
   .tour-pricing .price-amount {
-    font-size: $font-size-2xl;
+    font-size: vars.$font-size-2xl;
   }
-}
-
-@keyframes tourDetailEnter {
-  from {
-    opacity: 0;
-    transform: translateY(30px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.tour-detail {
-  animation: tourDetailEnter 0.6s ease-out;
 }

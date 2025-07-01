@@ -36,10 +36,10 @@
       <div class="tour-content">
         <div class="tour-image-section">
           <img
-            [src]="'assets/images/' + tour.img"
+            [src]="getImageUrl(tour.img)"
             [alt]="tour.name"
             class="tour-main-image"
-            onerror="this.src='assets/images/placeholder.jpg'"
+            (error)="onImageError($event)"
           />
         </div>
 

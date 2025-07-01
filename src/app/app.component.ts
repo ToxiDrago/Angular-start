@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ToastModule } from 'primeng/toast';
 import { HeaderComponent } from './components/header/header.component';
+import { ToastComponent } from './components/toast/toast.component';
 import { AuthService, AuthResponse } from './shared/services/auth.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, ToastModule, HeaderComponent],
+  imports: [RouterOutlet, CommonModule, HeaderComponent, ToastComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
