@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 import { AuthService } from '../shared/services/auth.service';
 
@@ -6,15 +6,16 @@ import { AuthService } from '../shared/services/auth.service';
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
   canActivate(): boolean {
-    if (this.authService.isAuthenticated()) {
+    if (this.authService.isAuthenticated() && this.authService.isSessionValid()) {
+      console.log('✅ Auth Guard: Access granted');
       return true;
     } else {
+      console.log('❌ Auth Guard: Access denied, redirecting to login');
+      this.authService.clearUserData();
       this.router.navigate(['/login']);
       return false;
     }

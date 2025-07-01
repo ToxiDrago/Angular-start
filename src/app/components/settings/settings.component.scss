@@ -1,0 +1,209 @@
+@use '../../styles/variables' as vars;
+@use '../../styles/mixins' as mixins;
+
+.settings-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: vars.$spacing-lg 0;
+
+  .container {
+    @include mixins.container;
+  }
+}
+
+.settings-header {
+  text-align: center;
+  margin-bottom: vars.$spacing-2xl;
+
+  .page-title {
+    @include mixins.page-title;
+    background: vars.$primary-gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: vars.$spacing-base;
+    margin-bottom: vars.$spacing-base;
+
+    i {
+      font-size: vars.$font-size-2xl;
+      color: vars.$primary-color;
+    }
+  }
+
+  .page-description {
+    font-size: vars.$font-size-lg;
+    color: vars.$gray-600;
+    margin: 0;
+  }
+}
+
+.settings-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: vars.$spacing-lg;
+  margin-bottom: vars.$spacing-2xl;
+
+  .menu-item-card {
+    @include mixins.card-base;
+    @include mixins.card-hover;
+    padding: 0;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+
+    .menu-button {
+      width: 100%;
+      padding: vars.$spacing-xl;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      transition: all vars.$transition-base;
+
+      &:hover {
+        background: linear-gradient(135deg, rgba(vars.$primary-color, 0.05) 0%, rgba(vars.$secondary-color, 0.05) 100%);
+        transform: translateY(-2px);
+
+        .menu-arrow i {
+          transform: translateX(4px);
+        }
+      }
+
+      .menu-button-content {
+        display: flex;
+        align-items: center;
+        gap: vars.$spacing-lg;
+        text-align: left;
+
+        .menu-icon {
+          width: 50px;
+          height: 50px;
+          border-radius: vars.$border-radius-full;
+          background: vars.$primary-gradient;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+
+          i {
+            font-size: vars.$font-size-xl;
+            color: white;
+          }
+        }
+
+        .menu-text {
+          flex: 1;
+
+          .menu-label {
+            @include mixins.card-title;
+            color: vars.$gray-900;
+            margin-bottom: vars.$spacing-xs;
+          }
+
+          .menu-description {
+            font-size: vars.$font-size-sm;
+            color: vars.$gray-600;
+            margin: 0;
+            line-height: vars.$line-height-normal;
+          }
+        }
+
+        .menu-arrow {
+          flex-shrink: 0;
+
+          i {
+            font-size: vars.$font-size-base;
+            color: vars.$gray-400;
+            transition: transform vars.$transition-base;
+          }
+        }
+      }
+    }
+  }
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: vars.$spacing-2xl;
+  color: vars.$gray-600;
+
+  i {
+    font-size: vars.$font-size-4xl;
+    color: vars.$gray-400;
+    margin-bottom: vars.$spacing-base;
+  }
+
+  h3 {
+    color: vars.$gray-700;
+    margin-bottom: vars.$spacing-sm;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.settings-info {
+  .info-card {
+    @include mixins.card-base;
+    padding: vars.$spacing-xl;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+
+    h3 {
+      @include mixins.section-title;
+      display: flex;
+      align-items: center;
+      gap: vars.$spacing-sm;
+      color: vars.$gray-800;
+      margin-bottom: vars.$spacing-base;
+
+      i {
+        color: vars.$primary-color;
+      }
+    }
+
+    p {
+      font-size: vars.$font-size-base;
+      line-height: vars.$line-height-relaxed;
+      color: vars.$gray-700;
+      margin: 0;
+    }
+  }
+}
+
+@include mixins.respond-to(md) {
+  .menu-grid {
+    grid-template-columns: 1fr;
+    gap: vars.$spacing-base;
+  }
+
+  .menu-item-card .menu-button {
+    padding: vars.$spacing-lg;
+
+    .menu-button-content {
+      gap: vars.$spacing-base;
+
+      .menu-icon {
+        width: 40px;
+        height: 40px;
+
+        i {
+          font-size: vars.$font-size-lg;
+        }
+      }
+    }
+  }
+}

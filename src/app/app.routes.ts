@@ -5,6 +5,8 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { TicketsComponent } from './components/tickets/tickets.component';
 import { ToursComponent } from './components/tours/tours.component';
 import { TourItemComponent } from './components/tour-item/tour-item.component';
+import { SettingsComponent } from './components/settings/settings.component';
+import { ChangePasswordComponent } from './components/settings/change-password/change-password.component';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -14,6 +16,8 @@ export const routes: Routes = [
   { path: 'tickets', component: TicketsComponent, canActivate: [AuthGuard] },
   { path: 'tours', component: ToursComponent, canActivate: [AuthGuard] },
   { path: 'tours/:id', component: TourItemComponent, canActivate: [AuthGuard] },
+  { path: 'settings', component: SettingsComponent, canActivate: [AuthGuard] },
+  { path: 'settings/change-password', component: ChangePasswordComponent, canActivate: [AuthGuard] },
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: '/login' }
 ];

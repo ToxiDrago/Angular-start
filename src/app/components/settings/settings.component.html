@@ -1,0 +1,59 @@
+<div class="settings-container">
+  <div class="container">
+    <div class="settings-header">
+      <h1 class="page-title">
+        <i class="pi pi-cog"></i>
+        Настройки
+      </h1>
+      <p class="page-description">
+        Управление настройками и параметрами системы
+      </p>
+    </div>
+
+    <div class="settings-content">
+      <div class="menu-grid">
+        @for (item of menuItems; track item.id) {
+        <div class="menu-item-card">
+          <button
+            class="menu-button"
+            [routerLink]="item.route"
+            (click)="onMenuItemClick(item)"
+          >
+            <div class="menu-button-content">
+              <div class="menu-icon">
+                <i [class]="item.icon"></i>
+              </div>
+              <div class="menu-text">
+                <h3 class="menu-label">{{ item.label }}</h3>
+                <p class="menu-description">{{ item.description }}</p>
+              </div>
+              <div class="menu-arrow">
+                <i class="pi pi-chevron-right"></i>
+              </div>
+            </div>
+          </button>
+        </div>
+        } @empty {
+        <div class="empty-state">
+          <i class="pi pi-info-circle"></i>
+          <h3>Нет доступных настроек</h3>
+          <p>В данный момент настройки недоступны</p>
+        </div>
+        }
+      </div>
+
+      <div class="settings-info">
+        <div class="info-card">
+          <h3>
+            <i class="pi pi-info-circle"></i>
+            Информация
+          </h3>
+          <p>
+            В разделе настроек вы можете управлять своим профилем, изменять
+            пароль и просматривать статистику использования.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
