@@ -1,0 +1,40 @@
+<aside class="aside">
+  <div class="aside-content">
+    <h3>Фильтры</h3>
+
+    <div class="filter-section">
+      <label>Тип тура:</label>
+      <p-dropdown
+        [options]="tourTypes"
+        [(ngModel)]="selectedType"
+        (onChange)="onTypeChange()"
+        placeholder="Выберите тип тура"
+        [showClear]="true"
+      >
+      </p-dropdown>
+    </div>
+
+    <div class="filter-section">
+      <label>Дата:</label>
+      <p-calendar
+        [(ngModel)]="selectedDate"
+        (onSelect)="onDateChange()"
+        (onClear)="onClearDate()"
+        [showClear]="true"
+        [showIcon]="true"
+        dateFormat="dd.mm.yy"
+        placeholder="Выберите дату"
+      >
+      </p-calendar>
+    </div>
+
+    <div class="filter-section">
+      <p-button
+        label="Очистить фильтры"
+        (onClick)="onClearDate()"
+        severity="secondary"
+      >
+      </p-button>
+    </div>
+  </div>
+</aside>

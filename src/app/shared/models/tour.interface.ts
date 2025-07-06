@@ -1,12 +1,14 @@
 export interface Tour {
-  id: string;
+  id: number;
   name: string;
   description: string;
   tourOperator: string;
-  price: string;
-  img: string;
-  type?: 'single' | 'multi';
-  date?: string;
+  price: number;
+  type?: "beach" | "mountain" | "city" | "adventure";
+  date: string;
+  location?: string;
+  duration: number | string;
+  img?: string;
   locationId?: string;
   firstName?: string;
   lastName?: string;
@@ -16,6 +18,8 @@ export interface Tour {
   citizenship?: string;
   avatar?: string;
   createdAt?: string;
+  imageUrl?: string;
+  rating?: number;
 }
 
 export interface ToursResponse {
@@ -38,7 +42,6 @@ export interface TourSortOptions {
   direction: 'asc' | 'desc';
 }
 
-// Добавляем интерфейс Location
 export interface Location {
   id: string;
   name: string;
@@ -57,7 +60,6 @@ export interface NearestToursRequest {
   limit?: number;
 }
 
-// Дополнительные интерфейсы для расширенной функциональности
 export interface TourStats {
   totalTours: number;
   averagePrice: number;

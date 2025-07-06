@@ -1,7 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthService, AuthResponse } from '../../shared/services/auth.service';
 import { Router } from '@angular/router';
+import { AuthService, AuthResponse } from '../../shared/services/auth.service';
+import { NotificationService } from '../../shared/services/notification.service';
+
+interface Ticket {
+  id: number;
+  title: string;
+  description: string;
+  status: 'open' | 'in-progress' | 'closed';
+  priority: 'high' | 'medium' | 'low';
+  createdAt: Date;
+}
 
 @Component({
   selector: 'app-tickets',
@@ -12,11 +22,12 @@ import { Router } from '@angular/router';
 })
 export class TicketsComponent implements OnInit {
   currentUser: AuthResponse | null = null;
-  tickets: any[] = [];
+  tickets: Ticket[] = [];
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -57,6 +68,27 @@ export class TicketsComponent implements OnInit {
         createdAt: new Date('2024-01-13')
       }
     ];
+  }
+
+  viewTicket(ticket: Ticket): void {
+    this.notificationService.showInfo(
+      'Просмотр тикета',
+      `Открытие тикета #${ticket.id}: ${ticket.title}`
+    );
+  }
+
+  editTicket(ticket: Ticket): void {
+    this.notificationService.showInfo(
+      'Редактирование тикета',
+      `Редактирование тикета #${ticket.id}: ${ticket.title}`
+    );
+  }
+
+  createTicket(): void {
+    this.notificationService.showSuccess(
+      'Создание тикета',
+      'Переход к форме создания нового тикета'
+    );
   }
 
   logout(): void {

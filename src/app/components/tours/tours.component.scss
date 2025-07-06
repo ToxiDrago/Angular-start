@@ -2,36 +2,207 @@
 @use '../../styles/mixins' as mixins;
 
 .tours-container {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  padding: vars.$spacing-lg 0;
-  gap: vars.$spacing-lg;
-  margin-bottom: vars.$spacing-2xl;
-  @include mixins.fade-in-animation;
-
-  .container {
-    @include mixins.container;
-  }
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .tours-header {
   text-align: center;
-  margin-bottom: vars.$spacing-2xl;
+  margin-bottom: 40px;
   
   h1 {
-    @include mixins.page-title;
-    background: vars.$primary-gradient;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: vars.$spacing-base;
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 10px;
   }
   
-  .stats {
-    font-size: vars.$font-size-lg;
-    color: vars.$gray-600;
+  p {
+    font-size: 1.1rem;
+    color: #666;
     margin: 0;
-    font-weight: vars.$font-weight-normal;
+  }
+}
+
+.tours-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 30px;
+}
+
+.tour-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.tour-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+  }
+  
+  &:hover img {
+    transform: scale(1.05);
+  }
+}
+
+.tour-content {
+  padding: 20px;
+}
+
+.tour-content h3 {
+  font-size: 1.4rem;
+  color: #333;
+  margin: 0 0 10px 0;
+  font-weight: 600;
+}
+
+.tour-description {
+  color: #666;
+  line-height: 1.5;
+  margin: 0 0 15px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.tour-details {
+  margin-bottom: 20px;
+}
+
+.tour-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+  
+  span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #555;
+    
+    i {
+      width: 16px;
+      color: #2c5aa0;
+    }
+  }
+}
+
+.tour-rating {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  
+  .stars {
+    display: flex;
+    gap: 2px;
+    
+    i {
+      color: #ddd;
+      font-size: 14px;
+      
+      &.filled {
+        color: #ffd700;
+      }
+    }
+  }
+  
+  .rating-text {
+    font-size: 0.9rem;
+    color: #666;
+    font-weight: 500;
+  }
+}
+
+.tour-footer {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.tour-price {
+  .price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2c5aa0;
+    display: block;
+  }
+  
+  .per-person {
+    font-size: 0.8rem;
+    color: #666;
+  }
+}
+
+.tour-meta {
+  text-align: right;
+  
+  .operator {
+    display: block;
+    font-size: 0.9rem;
+    color: #333;
+    font-weight: 500;
+  }
+  
+  .date {
+    display: block;
+    font-size: 0.8rem;
+    color: #666;
+  }
+}
+
+.no-tours {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+  
+  p {
+    font-size: 1.1rem;
+    margin: 5px 0;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .tours-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .tours-header h1 {
+    font-size: 2rem;
+  }
+  
+  .tour-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .tour-meta {
+    text-align: left;
   }
 }
 
@@ -160,148 +331,6 @@
       
       &:hover {
         color: vars.$primary-dark;
-      }
-    }
-  }
-}
-
-.tours-grid {
-  // Move properties before nested selectors
-  gap: vars.$spacing-xl;
-  margin-bottom: vars.$spacing-2xl;
-  @include mixins.grid-responsive(1, 2, 3);
-  
-  .tour-card {
-    @include mixins.card-base;
-    @include mixins.card-hover;
-    padding: 0;
-    cursor: pointer;
-    text-decoration: none;
-    color: inherit;
-    height: fit-content;
-    display: flex;
-    flex-direction: column;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    transition: all vars.$transition-base;
-    @include mixins.slide-up;
-    
-    &:hover {
-      transform: translateY(-8px) scale(1.02);
-      box-shadow: vars.$shadow-xl;
-      border-color: rgba(vars.$primary-color, 0.3);
-    }
-    
-    .tour-image-container {
-      position: relative;
-      height: vars.$tour-image-height;
-      overflow: hidden;
-      border-radius: vars.$border-radius-md vars.$border-radius-md 0 0;
-      
-      img {
-        @include mixins.image-cover;
-        transition: transform vars.$transition-slow;
-        
-        &.loading {
-          opacity: 0.7;
-        }
-        
-        &.loaded {
-          opacity: 1;
-        }
-      }
-      
-      &:hover img {
-        transform: scale(1.1);
-      }
-      
-      .image-loading-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255, 255, 255, 0.8);
-        @include mixins.flex-center;
-        
-        .image-spinner {
-          width: 30px;
-          height: 30px;
-          border: 3px solid vars.$gray-200;
-          border-top: 3px solid vars.$primary-color;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-        }
-      }
-      
-      .price-badge {
-        position: absolute;
-        top: vars.$spacing-sm;
-        right: vars.$spacing-sm;
-        @include mixins.badge-base;
-        background: rgba(vars.$primary-color, 0.9);
-        color: vars.$white;
-        backdrop-filter: blur(10px);
-        font-weight: vars.$font-weight-bold;
-        font-size: vars.$font-size-sm;
-      }
-    }
-    
-    .tour-content {
-      padding: vars.$spacing-lg;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: vars.$spacing-base;
-      
-      .tour-name {
-        @include mixins.card-title;
-        @include mixins.text-clamp(2);
-        margin-bottom: vars.$spacing-sm;
-        color: vars.$gray-900;
-        font-size: vars.$font-size-xl;
-      }
-      
-      .tour-description {
-        @include mixins.text-clamp(3);
-        color: vars.$gray-600;
-        font-size: vars.$font-size-sm;
-        line-height: vars.$line-height-relaxed;
-        flex: 1;
-        margin-bottom: vars.$spacing-base;
-      }
-      
-      .tour-meta {
-        display: flex;
-        flex-direction: column;
-        gap: vars.$spacing-sm;
-        margin-bottom: vars.$spacing-base;
-        
-        .tour-operator,
-        .tour-type,
-        .tour-date {
-          display: flex;
-          align-items: center;
-          gap: vars.$spacing-sm;
-          font-size: vars.$font-size-sm;
-          color: vars.$gray-600;
-          font-weight: vars.$font-weight-medium;
-        }
-      }
-    }
-    
-    .tour-actions {
-      padding: 0 vars.$spacing-lg vars.$spacing-lg;
-      
-      .view-button {
-        @include mixins.button-variant(vars.$primary-color, vars.$primary-dark);
-        width: 100%;
-        font-size: vars.$font-size-sm;
-        
-        &:hover {
-          transform: translateY(-2px);
-        }
       }
     }
   }

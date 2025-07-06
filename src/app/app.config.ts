@@ -1,20 +1,30 @@
-import { ApplicationConfig, provideZoneChangeDetection, APP_INITIALIZER } from '@angular/core';
+import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
-import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { providePrimeNG } from 'primeng/config';
+
 import { routes } from './app.routes';
-import { appInitializerFactory } from './shared/initializers/app.initializer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(),
-    provideAnimations(),
-    {
-      provide: APP_INITIALIZER,
-      useFactory: appInitializerFactory,
-      multi: true
-    }
+    provideAnimationsAsync(),
+    providePrimeNG({
+      ripple: true,
+      translation: {
+        firstDayOfWeek: 1,
+        dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+        dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+        dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+        monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+        monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+        today: 'Сегодня',
+        clear: 'Очистить',
+        accept: 'Принять',
+        reject: 'Отклонить'
+      }
+    })
   ]
 };

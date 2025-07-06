@@ -1,0 +1,21 @@
+<div class="nearest-tours">
+  <h2>Nearest Tours</h2>
+  <div class="search-container">
+    <input
+      #searchInput
+      type="text"
+      placeholder="Search tours..."
+      class="search-input"
+    />
+  </div>
+
+  <div class="tours-grid">
+    @for (tour of filteredTours$ | async; track tour.id) {
+    <app-tour-item [tour]="tour"></app-tour-item>
+    } @empty {
+    <div class="no-results">
+      <p>No tours found</p>
+    </div>
+    }
+  </div>
+</div>

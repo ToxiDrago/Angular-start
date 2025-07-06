@@ -1,0 +1,160 @@
+@use '../../styles/variables' as vars;
+@use '../../styles/mixins' as mixins;
+
+.nearest-tours {
+  padding: 20px;
+  
+  h2 {
+    margin-bottom: 20px;
+    color: #333;
+  }
+}
+
+.search-container {
+  margin-bottom: 20px;
+  
+  .search-input {
+    width: 100%;
+    max-width: 400px;
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    
+    &:focus {
+      outline: none;
+      border-color: #2c5aa0;
+      box-shadow: 0 0 0 2px rgba(44, 90, 160, 0.2);
+    }
+  }
+}
+
+.tours-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  
+  p {
+    font-size: 18px;
+    margin: 0;
+  }
+}
+
+.nearest-tours-container {
+  @include mixins.card-base;
+  padding: vars.$spacing-xl;
+  margin-bottom: vars.$spacing-xl;
+  min-width: 100%;
+  width: 100%;
+}
+
+.nearest-tours-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: vars.$spacing-lg;
+  
+  h2 {
+    @include mixins.section-title;
+    margin: 0;
+  }
+  
+  .search-container {
+    position: relative;
+    
+    .search-input {
+      @include mixins.form-control;
+      width: 250px;
+      padding-right: 40px;
+    }
+    
+    .search-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: vars.$gray-500;
+    }
+  }
+}
+
+.tour-card {
+  @include mixins.card-base;
+  @include mixins.card-hover;
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+  
+  .tour-image {
+    height: 150px;
+    overflow: hidden;
+    
+    img {
+      @include mixins.image-cover;
+    }
+  }
+  
+  .tour-info {
+    padding: vars.$spacing-base;
+    
+    h3 {
+      @include mixins.card-title;
+      margin-bottom: vars.$spacing-sm;
+    }
+    
+    p {
+      font-size: vars.$font-size-sm;
+      color: vars.$gray-600;
+      margin-bottom: vars.$spacing-sm;
+    }
+    
+    .tour-price {
+      font-weight: vars.$font-weight-bold;
+      color: vars.$primary-color;
+      font-size: vars.$font-size-lg;
+    }
+  }
+}
+
+.no-tours-found {
+  width: 100%;
+  min-height: 200px;
+  @include mixins.flex-center;
+  @include mixins.flex-column;
+  text-align: center;
+  color: vars.$gray-600;
+  
+  i {
+    font-size: vars.$font-size-4xl;
+    color: vars.$gray-400;
+    margin-bottom: vars.$spacing-base;
+  }
+  
+  h3 {
+    color: vars.$gray-700;
+    margin-bottom: vars.$spacing-sm;
+  }
+  
+  p {
+    margin: 0;
+  }
+}
+
+.loading-state {
+  @include mixins.flex-center;
+  @include mixins.flex-column;
+  min-height: 200px;
+  
+  i {
+    font-size: vars.$font-size-2xl;
+    color: vars.$primary-color;
+    margin-bottom: vars.$spacing-base;
+  }
+}

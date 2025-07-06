@@ -59,8 +59,14 @@
             Создан: {{ ticket.createdAt | date : "dd.MM.yyyy HH:mm" }}
           </span>
           <div class="ticket-actions">
-            <button class="btn-view">Просмотр</button>
-            <button class="btn-edit" *ngIf="ticket.status !== 'closed'">
+            <button class="btn-view" (click)="viewTicket(ticket)">
+              Просмотр
+            </button>
+            <button
+              class="btn-edit"
+              *ngIf="ticket.status !== 'closed'"
+              (click)="editTicket(ticket)"
+            >
               Редактировать
             </button>
           </div>
@@ -71,7 +77,9 @@
     <ng-template #noTickets>
       <div class="no-tickets">
         <p>У вас пока нет тикетов</p>
-        <button class="create-ticket-btn">Создать первый тикет</button>
+        <button class="create-ticket-btn" (click)="createTicket()">
+          Создать тикет
+        </button>
       </div>
     </ng-template>
   </div>
