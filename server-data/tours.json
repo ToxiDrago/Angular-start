@@ -7,11 +7,10 @@
             "tourOperator": "LocalAdventures",
             "price": "€2,192",
             "img": "pic1.jpg",
- 
- 
             "locationId": "1fe323",
-             "date": "2025-03-04T15:30:46.910Z",
-             "type": "single"
+            "date": "2025-03-04T15:30:46.910Z",
+            "type": "single",
+            "country": "Мексика"
         },
         {
             "id": "1-1",
@@ -20,9 +19,10 @@
             "tourOperator": "Emerald Waterways",
             "price": "€3,579",
             "img": "pic1.jpg",
-                 "locationId": "1fe2gfg233",
-                  "date": "2025-03-04T15:30:46.910Z",
-             "type": "group"
+            "locationId": "1fe2gfg233",
+            "date": "2025-03-04T15:30:46.910Z",
+            "type": "group",
+            "country": "Италия"
         },
         {
             "id": "2",
@@ -31,9 +31,10 @@
             "tourOperator": "LocalAdventures",
             "price": "€1,100",
             "img": "pic2.jpg",
-             "locationId": "1fe2gfg233",
-              "date": "2025-03-04T15:30:46.910Z",
-             "type": "group"
+            "locationId": "1fe2gfg233",
+            "date": "2025-03-04T15:30:46.910Z",
+            "type": "group",
+            "country": "Египет"
         },
         {
             "id": "2-4",
@@ -42,9 +43,10 @@
             "tourOperator": "Emerald Waterways",
             "price": "€825",
             "img": "pic3.jpg",
-             "locationId": "1fe21233",
-              "date": "2025-03-04T15:30:46.910Z",
-             "type": "group"
+            "locationId": "1fe21233",
+            "date": "2025-03-04T15:30:46.910Z",
+            "type": "group",
+            "country": "Филиппины"
         },
         {
             "id": "3",
@@ -53,8 +55,9 @@
             "tourOperator": "Bali Bucket List Tours",
             "price": "€761",
             "img": "pic4.jpg",
-                    "date": "2025-03-04T15:30:46.910Z",
-             "type": "group"
+            "date": "2025-03-04T15:30:46.910Z",
+            "type": "group",
+            "country": "Танзания"
         },
         {
             "id": "4",
@@ -64,9 +67,10 @@
             "price": "€1200",
             "img": "pic5.jpg",
             "locationId": "1fe2gfg233",
-             "date": "2025-03-04T15:30:46.910Z",
-             "type": "group"
-        }, 
+            "date": "2025-03-04T15:30:46.910Z",
+            "type": "group",
+            "country": "США"
+        },
         {
             "id": "5",
             "name": "Bali Bucket List Original 10 Day Tour",
@@ -74,9 +78,10 @@
             "tourOperator": "LocalAdventures",
             "price": "€950",
             "img": "pic6.jpg",
-             "locationId": "1fe21233",
-              "date": "2025-03-04T15:30:46.910Z",
-             "type": "group"
+            "locationId": "1fe21233",
+            "date": "2025-03-04T15:30:46.910Z",
+            "type": "group",
+            "country": "Индонезия"
         },
         {
             "id": "6",
@@ -85,9 +90,10 @@
             "tourOperator": "Emerald Waterways",
             "price": "€1200",
             "img": "pic7.jpg",
-             "locationId": "1fe2gfg233",
-                              "date": "2025-03-04T15:30:46.910Z",
-             "type": "single"
+            "locationId": "1fe2gfg233",
+            "date": "2025-03-04T15:30:46.910Z",
+            "type": "single",
+            "country": "США"
         },
         {
             "id": "7",
@@ -96,9 +102,10 @@
             "tourOperator": "LocalAdventures",
             "price": "€680",
             "img": "pic8.jpg",
-             "locationId": "1fe323",
-                              "date": "2025-03-04T15:30:46.910Z",
-             "type": "single"
+            "locationId": "1fe323",
+            "date": "2025-03-04T15:30:46.910Z",
+            "type": "single",
+            "country": "Шри-Ланка"
         },
         {
             "id": "8",
@@ -107,9 +114,10 @@
             "tourOperator": "Emerald Waterways",
             "price": "€1,279",
             "img": "pic9.jpg",
-             "locationId": "1fe21233",
-                              "date": "2025-03-04T15:30:46.910Z",
-             "type": "single"
+            "locationId": "1fe21233",
+            "date": "2025-03-04T15:30:46.910Z",
+            "type": "single",
+            "country": "Перу"
         },
         {
             "id": "9",
@@ -118,9 +126,10 @@
             "tourOperator": "LocalAdventures",
             "price": "€1,192",
             "img": "pic1.jpg",
-             "locationId": "1fe2gfg233",
-                              "date": "2025-03-04T15:30:46.910Z",
-             "type": "single"
+            "locationId": "1fe2gfg233",
+            "date": "2025-03-04T15:30:46.910Z",
+            "type": "single",
+            "country": "Япония"
         },
         {
             "id": "10",
@@ -130,8 +139,9 @@
             "price": "€2,192",
             "img": "ocean.jpg",
             "locationId": "1fe2gfg233",
-                             "date": "2025-03-04T15:30:46.910Z",
-             "type": "single"
+            "date": "2025-03-04T15:30:46.910Z",
+            "type": "single",
+            "country": "Мексика"
         },
         {
             "id": "11",
@@ -140,9 +150,10 @@
             "tourOperator": "Emerald Waterways",
             "price": "€3,579",
             "img": "pic1.jpg",
-             "locationId": "1fe21233",
-                              "date": "2025-03-04T15:30:46.910Z",
-             "type": "single"
+            "locationId": "1fe21233",
+            "date": "2025-03-04T15:30:46.910Z",
+            "type": "single",
+            "country": "Италия"
         },
         {
             "id": "12",
@@ -152,8 +163,9 @@
             "price": "€1,100",
             "img": "pic2.jpg",
             "locationId": "1fe2gfg233",
-                             "date": "2025-03-04T15:30:46.910Z",
-             "type": "single"
+            "date": "2025-03-04T15:30:46.910Z",
+            "type": "single",
+            "country": "Египет"
         },
         {
             "id": "13",
@@ -163,8 +175,9 @@
             "price": "€825",
             "img": "pic3.jpg",
             "locationId": "1fe2gfg233",
-                   "date": "2025-03-04T15:30:46.910Z",
-             "type": "single"
+            "date": "2025-03-04T15:30:46.910Z",
+            "type": "single",
+            "country": "Филиппины"
         },
         {
             "id": "14",
@@ -174,8 +187,9 @@
             "price": "€761",
             "img": "pic4.jpg",
             "locationId": "1fe323",
-               "date": "2025-03-05T15:30:46.910Z",
-             "type": "group"
+            "date": "2025-03-05T15:30:46.910Z",
+            "type": "group",
+            "country": "Танзания"
         },
         {
             "id": "15",
@@ -185,8 +199,9 @@
             "price": "€1200",
             "img": "pic5.jpg",
             "locationId": "1fe2gfg233",
-               "date": "2025-03-05T15:30:46.910Z",
-             "type": "group"
+            "date": "2025-03-05T15:30:46.910Z",
+            "type": "group",
+            "country": "США"
         },
         {
             "id": "16",
@@ -195,9 +210,10 @@
             "tourOperator": "LocalAdventures",
             "price": "€950",
             "img": "pic6.jpg",
-             "locationId": "1fe21233",
-                "date": "2025-03-05T15:30:46.910Z",
-             "type": "group"
+            "locationId": "1fe21233",
+            "date": "2025-03-05T15:30:46.910Z",
+            "type": "group",
+            "country": "Индонезия"
         },
         {
             "id": "17",
@@ -207,8 +223,9 @@
             "price": "€1200",
             "img": "pic7.jpg",
             "locationId": "1fe2gfg233",
-              "date": "2025-03-05T15:30:46.910Z",
-             "type": "single"
+            "date": "2025-03-05T15:30:46.910Z",
+            "type": "single",
+            "country": "США"
         },
         {
             "id": "18",
@@ -217,9 +234,10 @@
             "tourOperator": "LocalAdventures",
             "price": "€680",
             "img": "pic8.jpg",
-             "locationId": "1fe2gfg233",
-                "date": "2025-03-05T15:30:46.910Z",
-             "type": "single"
+            "locationId": "1fe2gfg233",
+            "date": "2025-03-05T15:30:46.910Z",
+            "type": "single",
+            "country": "Шри-Ланка"
         },
         {
             "id": "19",
@@ -228,9 +246,10 @@
             "tourOperator": "Emerald Waterways",
             "price": "€1,279",
             "img": "pic9.jpg",
-             "locationId": "1fe21233",
-                "date": "2025-03-05T15:30:46.910Z",
-             "type": "single"
+            "locationId": "1fe21233",
+            "date": "2025-03-05T15:30:46.910Z",
+            "type": "single",
+            "country": "Перу"
         },
         {
             "id": "20",
@@ -240,8 +259,9 @@
             "price": "€1,192",
             "img": "pic1.jpg",
             "locationId": "1fe2g2233",
-               "date": "2025-03-05T15:30:46.910Z",
-             "type": "single"
+            "date": "2025-03-05T15:30:46.910Z",
+            "type": "single",
+            "country": "Япония"
         },
         {
             "id": "21",
@@ -251,9 +271,9 @@
             "price": "€2,192",
             "img": "ocean.jpg",
             "locationId": "1fe2g2233",
-                     "date": "2025-03-07T15:30:46.910Z",
-             "type": "single"
- 
+            "date": "2025-03-07T15:30:46.910Z",
+            "type": "single",
+            "country": "Мексика"
         },
         {
             "id": "22",
@@ -263,8 +283,9 @@
             "price": "€3,579",
             "img": "pic1.jpg",
             "locationId": "1fe2g2233",
-                 "date": "2025-03-07T15:30:46.910Z",
-             "type": "single"
+            "date": "2025-03-07T15:30:46.910Z",
+            "type": "single",
+            "country": "Италия"
         },
         {
             "id": "23",
@@ -273,9 +294,10 @@
             "tourOperator": "LocalAdventures",
             "price": "€1,100",
             "img": "pic4.jpg",
-             "locationId": "1fe2g2233",
-                  "date": "2025-03-04T15:30:46.910Z",
-             "type": "group"
+            "locationId": "1fe2g2233",
+            "date": "2025-03-04T15:30:46.910Z",
+            "type": "group",
+            "country": "Египет"
         },
         {
             "id": "24",
@@ -285,8 +307,9 @@
             "price": "€825",
             "img": "pic3.jpg",
             "locationId": "1fe2g2233",
-                 "date": "2025-03-04T15:30:46.910Z",
-             "type": "group"
+            "date": "2025-03-04T15:30:46.910Z",
+            "type": "group",
+            "country": "Филиппины"
         },
         {
             "id": "25",
@@ -296,8 +319,9 @@
             "price": "€761",
             "img": "pic4.jpg",
             "locationId": "1fe2g2233",
-             "type": "single",
-             "date": "2025-03-02T15:30:46.910Z"
+            "type": "single",
+            "date": "2025-03-02T15:30:46.910Z",
+            "country": "Танзания"
         },
         {
             "id": "26",
@@ -306,9 +330,10 @@
             "tourOperator": "BH Lanka Tours",
             "price": "€1200",
             "img": "pic5.jpg",
-             "locationId": "1fe21233",
-              "date": "2025-03-04T15:30:46.910Z",
-             "type": "group"
+            "locationId": "1fe21233",
+            "date": "2025-03-04T15:30:46.910Z",
+            "type": "group",
+            "country": "США"
         },
         {
             "id": "27",
@@ -317,9 +342,10 @@
             "tourOperator": "LocalAdventures",
             "price": "€950",
             "img": "pic6.jpg",
-             "locationId": "1fe21233",
-               "date": "2025-01-21T15:30:46.910Z",
-             "type": "single"
+            "locationId": "1fe21233",
+            "date": "2025-01-21T15:30:46.910Z",
+            "type": "single",
+            "country": "Индонезия"
         },
         {
             "id": "28",
@@ -328,9 +354,10 @@
             "tourOperator": "Emerald Waterways",
             "price": "€1200",
             "img": "pic7.jpg",
-             "locationId": "1fe323",
-             "date": "2025-03-05T15:30:46.910Z",
-             "type": "single"
+            "locationId": "1fe323",
+            "date": "2025-03-05T15:30:46.910Z",
+            "type": "single",
+            "country": "США"
         },
         {
             "id": "29",
@@ -339,9 +366,10 @@
             "tourOperator": "LocalAdventures",
             "price": "€680",
             "img": "pic8.jpg",
-             "locationId": "1feas2g2233",
-                  "date": "2025-03-11T15:30:46.910Z",
-               "type": "single" 
+            "locationId": "1feas2g2233",
+            "date": "2025-03-11T15:30:46.910Z",
+            "type": "single",
+            "country": "Шри-Ланка"
         },
         {
             "id": "30",
@@ -350,9 +378,10 @@
             "tourOperator": "Emerald Waterways",
             "price": "€1,279",
             "img": "pic9.jpg",
-             "locationId": "1feas2g2233",
-             "date": "2025-03-11T15:30:46.910Z",
-               "type": "single"
+            "locationId": "1feas2g2233",
+            "date": "2025-03-11T15:30:46.910Z",
+            "type": "single",
+            "country": "Перу"
         },
         {
             "id": "31",
@@ -361,8 +390,9 @@
             "tourOperator": "LocalAdventures",
             "price": "€1,192",
             "img": "pic1.jpg",
-             "locationId": "1feas2g2233",
-             "type": "single"
+            "locationId": "1feas2g2233",
+            "type": "single",
+            "country": "Япония"
         },
         {
             "createdAt": "2022-11-09T06:25:38.670Z",
@@ -374,8 +404,8 @@
             "price": "€2,192",
             "img": "ocean.jpg",
             "type": "group",
-             "locationId": "1fe21233"
- 
+            "locationId": "1fe21233",
+            "country": "Мексика"
         },
         {
             "date": "2025-03-11T15:30:46.910Z",
@@ -386,7 +416,8 @@
             "price": "€2,192",
             "img": "ocean.jpg",
             "type": "group",
-             "locationId": "1feas2g2233"
+            "locationId": "1feas2g2233",
+            "country": "Мексика"
         },
         {
             "date": "2025-03-11T15:30:46.910Z",
@@ -396,8 +427,9 @@
             "tourOperator": "LocalAdventures",
             "price": "€2,192",
             "img": "ocean.jpg",
-             "locationId": "1feas2g2233",
-             "type": "group"
+            "locationId": "1feas2g2233",
+            "type": "group",
+            "country": "Мексика"
         }
     ]
 }

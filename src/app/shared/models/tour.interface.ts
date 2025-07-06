@@ -1,25 +1,15 @@
 export interface Tour {
-  id: number;
+  id: string;
   name: string;
   description: string;
   tourOperator: string;
-  price: number;
-  type?: "beach" | "mountain" | "city" | "adventure";
+  price: string;
+  img: string;
+  locationId: string;
   date: string;
-  location?: string;
-  duration: number | string;
-  img?: string;
-  locationId?: string;
-  firstName?: string;
-  lastName?: string;
-  cardNumber?: string;
-  birthDate?: string;
-  age?: number;
-  citizenship?: string;
-  avatar?: string;
-  createdAt?: string;
-  imageUrl?: string;
-  rating?: number;
+  type: string;
+  code?: string;
+  country: string;
 }
 
 export interface ToursResponse {

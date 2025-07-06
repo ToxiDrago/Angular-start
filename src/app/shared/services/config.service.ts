@@ -125,4 +125,8 @@ export class ConfigService {
   isInitialized(): boolean {
     return this.initialized;
   }
+
+  getApiUrl(): string {
+    return 'http://localhost:3000'; // Make sure this doesn't include /tours
+  }
 }

@@ -1,250 +1,276 @@
 const fs = require("fs");
 const cors = require("cors");
 const express = require("express");
-const path = require("path");
+const { log } = require("console");
 
-const userJson = path.join(__dirname, "..", "server-data", "users.json");
-const toursJson = path.join(__dirname, "..", "server-data", "tours.json");
-
-// Проверяем существование файлов
-if (!fs.existsSync(userJson)) {
-  console.error(`❌ User file not found: ${userJson}`);
-  process.exit(1);
-}
-
-if (!fs.existsSync(toursJson)) {
-  console.error(`❌ Tours file not found: ${toursJson}`);
-  process.exit(1);
-}
+const userJson = "./server-data/users.json";
+const toursJson = "./server-data/tours.json";
+const countriesJson = "./server-data/countries.json";
+const orderJson = "./server-data/orders.json";
+const jsonFileData = fs.readFileSync(userJson, "utf-8");
+let parseJsonData = JSON.parse(jsonFileData);
 
 const app = express();
 const port = 3000;
-
-// Middleware
+// cors logic
 app.use(cors());
+// add parser for post body
 app.use(express.json());
 
-// Логирование запросов
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-  next();
-});
-
-// Главная страница
+// route logic
 app.get("/", (req, res) => {
-  res.json({
-    message: "Tour Management API Server",
-    status: "running",
-    endpoints: [
-      "GET  /",
-      "POST /auth",
-      "POST /register",
-      "GET  /tours",
-      "GET  /tour/:id",
-      "GET  /nearestTours?locationId=xxx",
-    ],
-    timestamp: new Date().toISOString(),
-  });
+  res.send("Hello World!");
 });
 
-// Регистрация пользователя
+//************************ */ register****************************
 app.post("/register", (req, res) => {
-  try {
-    console.log("📝 Registration attempt:", {
-      login: req.body?.login,
-      email: req.body?.email,
-    });
-
-    if (!req.body?.login) {
-      return res.status(400).json({
-        error: "Не найдено свойство login",
-      });
-    }
-
-    const jsonFileData = fs.readFileSync(userJson, "utf-8");
-    const parseJsonData = JSON.parse(jsonFileData);
-
+  // find users
+  if (req.body?.login) {
     const isUserExist = parseJsonData.users.find(
-      (user) => user.login === req.body.login
+      (user) => user.login === req.body?.login
     );
+    if (!isUserExist) {
+      parseJsonData.users.push(req.body);
+      const json = JSON.stringify(parseJsonData);
+      fs.writeFileSync(
+        userJson,
+        json,
+        "utf-8",
+        (data) => {},
+        (err) => {
+          console.log("err write file", err);
+        }
+      );
 
-    if (isUserExist) {
-      return res.status(400).json({
-        error: "Пользователь уже зарегистрирован",
-      });
+      // send response
+      res.send("ok");
+    } else {
+      throw new Error("Пользователь уже зарегестрирован");
     }
-
-    // Добавляем нового пользователя
-    parseJsonData.users.push({
-      login: req.body.login,
-      password: req.body.password,
-      email: req.body.email || "",
-    });
-
-    const json = JSON.stringify(parseJsonData, null, 2);
-    fs.writeFileSync(userJson, json, "utf-8");
-
-    console.log("✅ User registered successfully:", req.body.login);
-    res.json({
-      success: true,
-      message: "Пользователь успешно зарегистрирован",
-    });
-  } catch (error) {
-    console.error("❌ Registration error:", error);
-    res.status(500).json({
-      error: "Ошибка сервера при регистрации",
-    });
+  } else {
+    throw new Error("не найдено свойство login");
   }
+  console.log("parseJsonData Registration", parseJsonData);
 });
 
-// Авторизация пользователя
+//************** */ auth**************************************
 app.post("/auth", (req, res) => {
-  try {
-    console.log("🔐 Authentication attempt:", {
-      login: req.body?.login,
-    });
+  log("req.body", req.body);
 
-    if (!req.body?.login || !req.body?.password) {
-      return res.status(400).json({
-        error: "Не найдено свойство login или password",
-      });
-    }
-
-    const jsonFileData = fs.readFileSync(userJson, "utf-8");
-    const parseJsonData = JSON.parse(jsonFileData);
-
-    if (!Array.isArray(parseJsonData?.users)) {
-      return res.status(500).json({
-        error: "Ошибка структуры данных пользователей",
-      });
-    }
-
-    const isUserExist = parseJsonData.users.find(
-      (user) =>
-        user.login === req.body.login && user.password === req.body.password
+  if (req.body?.login && req.body.password) {
+    // read file
+    const jsonFileData = fs.readFileSync(
+      userJson,
+      "utf-8",
+      (err, data) => {},
+      (err) => {
+        console.log("err read file", err);
+      }
     );
 
-    if (isUserExist) {
-      console.log("✅ Authentication successful:", req.body.login);
-      const { password, ...userResponse } = isUserExist;
-      res.json(userResponse);
-    } else {
-      console.log("❌ Authentication failed:", req.body.login);
-      res.status(401).json({
-        error: "Неверный логин или пароль",
-      });
+    // parse data
+    const parseJsonData = JSON.parse(jsonFileData);
+    console.log("parseJsonData auth", parseJsonData);
+
+    if (Array.isArray(parseJsonData?.users)) {
+      // check psw and login -- must contains password and login  field name
+      const isUserExist = parseJsonData?.users.find(
+        (user) =>
+          user.login === req.body?.login && user.password === req.body?.password
+      );
+
+      if (isUserExist) {
+        res.send(isUserExist);
+      } else {
+        // или отправить обьект с текстом ошибки
+        //res.send({error: true, errotText: 'Ошибка - пользователь не найден'});
+
+        // или явно выбросить исключения
+        throw new Error("AUTH-Error");
+      }
     }
-  } catch (error) {
-    console.error("❌ Auth error:", error);
-    res.status(500).json({
-      error: "Ошибка сервера при авторизации",
-    });
+  } else {
+    throw new Error("не найдено свойство login или password");
   }
 });
 
-// Получение всех туров
+//************** */ tours**************************************
+
 app.get("/tours", (req, res) => {
-  try {
-    console.log("📋 Fetching tours list");
-    const jsonFileData = fs.readFileSync(toursJson, "utf-8");
-    const toursData = JSON.parse(jsonFileData);
-
-    console.log(`✅ Returning ${toursData.tours?.length || 0} tours`);
-    res.json(toursData);
-  } catch (error) {
-    console.error("❌ Tours error:", error);
-    res.status(500).json({
-      error: "Ошибка загрузки туров",
-    });
-  }
+  const jsonFileData = fs.readFileSync(
+    toursJson,
+    "utf-8",
+    (err, data) => {},
+    (err) => {
+      console.log("err read file tours", err);
+    }
+  );
+  res.send(jsonFileData);
 });
 
-// Получение тура по ID
+/*******************get tour */
 app.get("/tour/:id", (req, res) => {
-  try {
-    const paramId = req.params.id;
-    console.log("🔍 Fetching tour by ID:", paramId);
-
-    const jsonFileData = fs.readFileSync(toursJson, "utf-8");
-    const parseJsonData = JSON.parse(jsonFileData);
-
-    const item = parseJsonData.tours.find((tour) => tour.id === paramId);
-
-    if (item) {
-      console.log("✅ Tour found:", item.name);
-      res.json(item);
-    } else {
-      console.log("❌ Tour not found for ID:", paramId);
-      res.status(404).json({
-        error: `Тур не найден по id: ${paramId}`,
-      });
+  const jsonFileData = fs.readFileSync(
+    toursJson,
+    "utf-8",
+    (err, data) => {},
+    (err) => {
+      console.log("err read file tours", err);
     }
-  } catch (error) {
-    console.error("❌ Tour by ID error:", error);
-    res.status(500).json({
-      error: "Ошибка загрузки тура",
-    });
+  );
+  // parse data
+  const parseJsonData = JSON.parse(jsonFileData);
+  const paramId = req.params.id;
+
+  const item = parseJsonData.tours.find((tour) => tour.id === paramId);
+  if (item) {
+    res.send(item);
+  } else {
+    throw new Error("Тур не найден по id:", paramId);
   }
 });
 
-// Получение ближайших туров по locationId
+/*******************get tour */
+app.get("/tour/:id", (req, res) => {
+  const jsonFileData = fs.readFileSync(
+    countriesJson,
+    "utf-8",
+    (err, data) => {},
+    (err) => {
+      console.log("err read file tours", err);
+    }
+  );
+  // parse data
+  const parseJsonData = JSON.parse(jsonFileData);
+  const paramId = req.params.id;
+
+  const item = parseJsonData.tours.find((tour) => tour.id === paramId);
+  if (item) {
+    res.send(item);
+  } else {
+    throw new Error("Тур не найден по id:", paramId);
+  }
+});
+
+/*******************get nearest tour */
 app.get("/nearestTours", (req, res) => {
-  try {
-    const locationId = req.query?.locationId;
-    console.log("🗺️ Fetching nearest tours for locationId:", locationId);
-
-    if (!locationId) {
-      return res.status(400).json({
-        error: "Не указан параметр locationId",
-      });
+  const jsonFileData = fs.readFileSync(
+    toursJson,
+    "utf-8",
+    (err, data) => {},
+    (err) => {
+      console.log("err read file tours", err);
     }
+  );
 
-    const jsonFileData = fs.readFileSync(toursJson, "utf-8");
-    const parseJsonData = JSON.parse(jsonFileData);
+  // parse data
+  const parseJsonData = JSON.parse(jsonFileData);
+  const locationId = req.query?.locationId;
+  console.log("req.query", req.query);
 
-    const items = parseJsonData.tours.filter(
-      (tour) => tour.locationId === locationId
-    );
+  const items = parseJsonData.tours.filter(
+    (tour) => tour.locationId === locationId
+  );
+  res.send(items);
+});
 
-    console.log(
-      `✅ Found ${items.length} nearest tours for locationId: ${locationId}`
-    );
-    res.json(items);
-  } catch (error) {
-    console.error("❌ Nearest tours error:", error);
-    res.status(500).json({
-      error: "Ошибка загрузки ближайших туров",
-    });
+/*******************get countries */
+app.get("/countries", (req, res) => {
+  const jsonFileData = fs.readFileSync(
+    countriesJson,
+    "utf-8",
+    (err, data) => {},
+    (err) => {
+      console.log("err read file tours", err);
+    }
+  );
+
+  // parse data
+  const parseJsonData = JSON.parse(jsonFileData);
+
+  res.send(parseJsonData);
+});
+
+/*******************delete tour */
+app.delete("/tour/:id", (req, res) => {
+  const jsonFileData = fs.readFileSync(
+    toursJson,
+    "utf-8",
+    (err, data) => {},
+    (err) => {
+      console.log("err read file tours", err);
+    }
+  );
+  // parse data
+  const parseJsonData = JSON.parse(jsonFileData);
+  const paramId = req.params.id;
+
+  const tours = parseJsonData.tours.filter((tour) => tour.id !== paramId);
+  const json = JSON.stringify({ tours: tours });
+
+  fs.writeFileSync(
+    toursJson,
+    json,
+    "utf-8",
+    (data) => {},
+    (err) => {
+      console.log("err write file", err);
+    }
+  );
+  if (paramId) {
+    res.send(tours);
+  } else {
+    throw new Error("Тур не найден по id:", paramId);
   }
 });
 
-// Обработка ошибок
-app.use((error, req, res, next) => {
-  console.error("💥 Unhandled error:", error);
-  res.status(500).json({
-    error: "Внутренняя ошибка сервера",
-  });
+/*******************post order */
+app.post("/order", (req, res) => {
+  const jsonFileData = fs.readFileSync(
+    orderJson,
+    "utf-8",
+    (err, data) => {},
+    (err) => {
+      console.log("err read orderJson tours", err);
+    }
+  );
+  // parse data
+  const parseJsonData = JSON.parse(jsonFileData);
+  const order = req.body;
+  parseJsonData.orders.push(order);
+
+  const json = JSON.stringify({ orders: parseJsonData.orders });
+
+  fs.writeFileSync(
+    orderJson,
+    json,
+    "utf-8",
+    (data) => {},
+    (err) => {
+      console.log("err write file", err);
+    }
+  );
+  res.send("ok");
 });
 
-// 404 обработчик
-app.use((req, res) => {
-  console.log("❌ 404 - Route not found:", req.path);
-  res.status(404).json({
-    error: "Маршрут не найден",
-  });
+/*******************get ord */
+app.get("/orders", (req, res) => {
+  const jsonFileData = fs.readFileSync(
+    orderJson,
+    "utf-8",
+    (err, data) => {},
+    (err) => {
+      console.log("err read file tours", err);
+    }
+  );
+
+  // parse data
+  const parseJsonData = JSON.parse(jsonFileData);
+
+  res.send(parseJsonData);
 });
 
-// Запуск сервера
+// run and listen serve
 app.listen(port, () => {
-  console.log(`🚀 Server listening on port ${port}`);
-  console.log(`📁 Users file: ${userJson}`);
-  console.log(`📁 Tours file: ${toursJson}`);
-  console.log(`🌐 API available at: http://localhost:${port}`);
-  console.log(`📖 API endpoints:`);
-  console.log(`   GET  /           - Server info`);
-  console.log(`   POST /auth       - User authentication`);
-  console.log(`   POST /register   - User registration`);
-  console.log(`   GET  /tours      - Get all tours`);
-  console.log(`   GET  /tour/:id   - Get tour by ID`);
-  console.log(`   GET  /nearestTours?locationId=xxx - Get nearest tours`);
+  console.log(`app listening on port ${port}`);
 });

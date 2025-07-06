@@ -1,30 +1,75 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, forkJoin, of } from 'rxjs';
 import { ToursService } from '../../shared/services/tours.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { Tour } from '../../shared/models/tour.interface';
+import { DropdownModule } from 'primeng/dropdown';
+import { CalendarModule } from 'primeng/calendar';
+import { CardModule } from 'primeng/card';
+import { InputTextModule } from 'primeng/inputtext';
+import { SliderModule } from 'primeng/slider';
+import { ButtonModule } from 'primeng/button';
+import { ConfirmationService } from 'primeng/api';
+import { catchError } from 'rxjs/operators';
+import { Country } from '../../shared/services/tours.service';
+import { DialogModule } from 'primeng/dialog';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ToastModule } from 'primeng/toast';
+import { NgIf, NgFor } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { AuthService } from '../../shared/services/auth.service';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { BasketStoreService } from '../../shared/services/basket-store.service';
 
 @Component({
   selector: 'app-tours',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    DropdownModule,
+    CalendarModule,
+    CardModule,
+    InputTextModule,
+    SliderModule,
+    ButtonModule,
+    DialogModule,
+    ConfirmDialogModule,
+    ToastModule,
+    NgIf,
+    NgFor,
+    ProgressSpinnerModule
+  ],
+  providers: [ConfirmationService],
   templateUrl: './tours.component.html',
   styleUrls: ['./tours.component.scss']
 })
 export class ToursComponent implements OnInit, OnDestroy {
-  tours$ = this.toursService.tours$;
+  allTours: Tour[] = [];
   filteredTours: Tour[] = [];
+  tourTypes: { label: string, value: string }[] = [];
+  selectedType: string = '';
+  selectedDate: Date | null = null;
+  searchTerm: string = '';
+  minPrice: number = 0;
+  maxPrice: number = 10000;
+  priceRange: [number, number] = [0, 10000];
+  
+  // Добавляем недостающие свойства
   loading = false;
-  error = false;
-  
-  searchTerm = '';
-  selectedType = '';
-  selectedOperator = '';
-  sortBy = '';
-  
+  error: string | null = null;
+  isAdmin = false;
+
+  tourTypeOptions = [
+    { label: 'Все типы', value: '' },
+    { label: 'Одиночный', value: 'single' },
+    { label: 'Групповой', value: 'group' }
+  ];
+
   currentPage = 1;
   pageSize = 10;
   totalTours = 0;
@@ -32,14 +77,37 @@ export class ToursComponent implements OnInit, OnDestroy {
   
   private destroy$ = new Subject<void>();
 
+  // Для модального окна
+  selectedTour: Tour | null = null;
+  selectedCountry: Country | null = null;
+  selectedWeather: any = null;
+  displayDialog = false;
+
+  countries: Country[] = [];
+
+  // Сопоставление locationId → iso_code2
+  private locationIdToCountryCode: { [key: string]: string } = {
+    '1fe323': 'MX',      // Mexico
+    '1fe2fg233': 'IT',   // Italia
+    // ... остальные id и коды стран
+  };
+
   constructor(
     private toursService: ToursService,
     private notificationService: NotificationService,
-    private router: Router
+    private confirmationService: ConfirmationService,
+    private http: HttpClient,
+    private authService: AuthService,
+    private basketStore: BasketStoreService
   ) {}
 
   ngOnInit(): void {
     this.loadTours();
+    this.loadCountries();
+    this.resetFilters();
+    // Определяем, админ ли пользователь (например, по логину)
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    this.isAdmin = user?.login === 'admin';
   }
 
   ngOnDestroy(): void {
@@ -47,90 +115,52 @@ export class ToursComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private loadTours(): void {
-    this.toursService.getTours()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (tours) => {
-          console.log('Tours loaded successfully:', tours);
-          this.tours$ = this.toursService.tours$;
-          this.filteredTours = tours;
-          this.totalTours = tours.length;
-          this.filteredCount = tours.length;
-          this.loading = false;
-        },
-        error: (error) => {
-          console.error('Error loading tours:', error);
-          this.error = true;
-          this.loading = false;
-          this.notificationService.showError('Ошибка загрузки туров');
-        }
-      });
-  }
-
-  onSearch(): void {
-    this.filterTours();
-  }
-
-  filterTours(): void {
-    let filtered = this.filteredTours;
-
-    if (this.searchTerm.trim()) {
-      const searchLower = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(tour => 
-        tour.name.toLowerCase().includes(searchLower) ||
-        tour.description.toLowerCase().includes(searchLower)
-      );
-    }
-
-    if (this.selectedType && this.selectedType !== '') {
-      filtered = filtered.filter(tour => tour.type === this.selectedType);
-    }
-
-    if (this.selectedOperator) {
-      filtered = filtered.filter(tour => {
-        const price = tour.price;
-        switch (this.selectedOperator) {
-          case 'lt':
-            return price < 50000;
-          case 'gt':
-            return price > 100000;
-          case 'eq':
-            return price >= 50000 && price <= 100000;
-          default:
-            return true;
-        }
-      });
-    }
-
-    this.filteredTours = filtered;
-    this.filteredCount = filtered.length;
-    this.currentPage = 1;
-  }
-
-  sortTours(): void {
-    if (!this.sortBy) return;
-
-    this.filteredTours.sort((a, b) => {
-      switch (this.sortBy) {
-        case 'name':
-          return a.name.localeCompare(b.name);
-        case 'price':
-          return a.price - b.price;
-        case 'date':
-          return new Date(a.date).getTime() - new Date(b.date).getTime();
-        default:
-          return 0;
+  loadTours(): void {
+    this.loading = true;
+    this.error = null;
+    
+    this.toursService.getTours().subscribe({
+      next: (tours: Tour[]) => {
+        this.allTours = tours;
+        const prices = tours.map(t => this.formatPrice(t.price));
+        this.minPrice = Math.min(...prices);
+        this.maxPrice = Math.max(...prices);
+        this.priceRange = [this.minPrice, this.maxPrice];
+        this.resetFilters();
+        this.totalTours = tours.length;
+        this.filteredCount = tours.length;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Ошибка загрузки туров:', err);
+        this.error = 'Ошибка загрузки туров';
+        this.loading = false;
+        this.notificationService.showError('Ошибка загрузки туров');
       }
     });
   }
 
+  applyFilters(): void {
+    this.filteredTours = this.allTours.filter(tour => {
+      const matchesType = this.selectedType ? tour.type === this.selectedType : true;
+      const matchesDate = this.selectedDate
+        ? (tour.date && tour.date.slice(0, 10) === this.selectedDate?.toISOString().slice(0, 10))
+        : true;
+      const matchesName = this.searchTerm
+        ? tour.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+        : true;
+      const price = this.formatPrice(tour.price);
+      const matchesPrice = price >= this.priceRange[0] && price <= this.priceRange[1];
+      return matchesType && matchesDate && matchesName && matchesPrice;
+    });
+  }
+
   resetFilters(): void {
-    this.searchTerm = '';
     this.selectedType = '';
-    this.selectedOperator = '';
-    this.sortBy = '';
-    this.filterTours();
+    this.selectedDate = null;
+    this.searchTerm = '';
+    this.priceRange = [this.minPrice, this.maxPrice];
+    this.applyFilters();
   }
 
   getTourImage(tour: Tour): string {
@@ -139,14 +169,10 @@ export class ToursComponent implements OnInit, OnDestroy {
 
   onImageError(event: Event): void {
     const img = event.target as HTMLImageElement;
-    img.src = 'assets/images/placeholder.svg';
+    img.src = 'assets/images/placeholder.jpg';
   }
 
-  onTourClick(tour: Tour): void {
-    this.router.navigate(['/tour', tour.id]);
-  }
-
-  trackByTourId(index: number, tour: Tour): number {
+  trackByTourId(index: number, tour: Tour): string {
     return tour.id;
   }
 
@@ -171,8 +197,9 @@ export class ToursComponent implements OnInit, OnDestroy {
   hasActiveFilters(): boolean {
     return this.searchTerm.trim() !== '' || 
            this.selectedType !== '' || 
-           this.selectedOperator !== '' || 
-           this.sortBy !== '';
+           this.selectedDate !== null ||
+           this.priceRange[0] !== this.minPrice ||
+           this.priceRange[1] !== this.maxPrice;
   }
 
   hasResults(): boolean {
@@ -183,10 +210,16 @@ export class ToursComponent implements OnInit, OnDestroy {
     return true;
   }
 
-  formatPrice(price: number): string {
-    return typeof price === 'number' && !isNaN(price)
-      ? `$${price.toFixed(2)}`
-      : 'N/A';
+  formatPrice(price: string): number {
+    if (!price) return 0;
+    const normalized = price.replace(/[^\d]/g, '');
+    return Number(normalized);
+  }
+
+  getCurrencySymbol(price: string): string {
+    if (!price) return '';
+    const match = price.match(/[^\d\s,\.]+/);
+    return match ? match[0] : '';
   }
 
   getTourTypeLabel(type: string): string {
@@ -204,7 +237,7 @@ export class ToursComponent implements OnInit, OnDestroy {
   }
 
   getTourLocation(tour: Tour): string {
-    return tour.location || 'Unknown location';
+    return tour.locationId || 'Unknown location';
   }
 
   getTourType(tour: Tour): string {
@@ -223,7 +256,73 @@ export class ToursComponent implements OnInit, OnDestroy {
         });
   }
 
-  getTourRating(tour: Tour): number {
-    return typeof tour.rating === 'number' && !isNaN(tour.rating) ? tour.rating : 0;
+  confirmDeleteTour(tour: Tour) {
+    this.confirmationService.confirm({
+      message: `Удалить тур "${tour.name}"?`,
+      header: 'Подтверждение удаления',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Да',
+      rejectLabel: 'Нет',
+      accept: () => this.deleteTour(tour.id),
+    });
+  }
+
+  deleteTour(id: string) {
+    this.toursService.deleteTour(id).subscribe({
+      next: (tours) => {
+        this.allTours = tours;
+        this.applyFilters();
+      },
+      error: (err) => {
+        // обработка ошибки
+      }
+    });
+  }
+
+  openTourDialog(tour: Tour) {
+    this.selectedTour = tour;
+    this.displayDialog = true;
+  }
+
+  addToBasket(tour: Tour) {
+    this.basketStore.addToBasket(tour);
+    this.displayDialog = false;
+  }
+
+  getCountryByLocationId(locationId: string): any | undefined {
+    const code = this.locationIdToCountryCode[locationId];
+    if (!code) return undefined;
+    return this.countries.find(
+      c => c.iso_code2 === code || c.iso_code3 === code
+    );
+  }
+
+  getCountryByTourName(tourName: string): any | undefined {
+    if (!tourName) return undefined;
+    // Сравниваем без учёта регистра и пробелов
+    return this.countries.find(
+      c => c.name_ru && tourName.trim().toLowerCase() === c.name_ru.trim().toLowerCase()
+    );
+  }
+
+  loadCountries() {
+    this.toursService.getCountries().subscribe({
+      next: (countries) => {
+        this.countries = countries;
+      },
+      error: (error) => {
+        console.error('Error loading countries:', error);
+        // Fallback to mock data if API fails
+        this.toursService.getMockCountries().subscribe({
+          next: (mockCountries) => {
+            this.countries = mockCountries;
+          }
+        });
+      }
+    });
+  }
+
+  getCountryInfo(countryName: string): Country | null {
+    return this.countries.find(c => c.name_ru === countryName) || null;
   }
 }

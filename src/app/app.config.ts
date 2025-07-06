@@ -1,8 +1,9 @@
 import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { providePrimeNG } from 'primeng/config';
+import { ConfirmationService } from 'primeng/api';
 
 import { routes } from './app.routes';
 
@@ -10,7 +11,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideHttpClient(),
-    provideAnimationsAsync(),
+    provideAnimations(),
     providePrimeNG({
       ripple: true,
       translation: {
@@ -25,6 +26,7 @@ export const appConfig: ApplicationConfig = {
         accept: 'Принять',
         reject: 'Отклонить'
       }
-    })
+    }),
+    ConfirmationService
   ]
 };

@@ -1,32 +1,20 @@
 <div class="tour-item">
-  <div class="tour-image">
-    <img
-      [src]="tour.imageUrl || 'assets/images/placeholder.svg'"
-      [alt]="tour.name"
-      (error)="onImageError($event)"
-    />
-  </div>
-
+  <img
+    class="tour-image"
+    [src]="'assets/images/' + tour.img"
+    (error)="onImageError($event)"
+    alt="{{ tour.name }}"
+  />
   <div class="tour-content">
-    <h3 class="tour-title">{{ tour.name }}</h3>
+    <h2>{{ tour.name }}</h2>
     <p class="tour-description">{{ tour.description }}</p>
-
     <div class="tour-details">
-      <span class="tour-location">
-        <i class="fas fa-map-marker-alt"></i>
-        {{ tour.location || "Unknown location" }}
-      </span>
-      <span class="tour-duration">
-        <i class="fas fa-clock"></i>
-        {{ tour.duration ? tour.duration + " days" : "N/A" }}
-      </span>
+      <span>Оператор: {{ tour.tourOperator }}</span>
+      <span>Дата: {{ tour.date | date : "dd.MM.yyyy" }}</span>
+      <span>Тип: {{ tour.type }}</span>
     </div>
-
     <div class="tour-footer">
-      <span class="tour-price">{{
-        tour.price | currency : "RUB" : "symbol" : "1.0-0"
-      }}</span>
-      <span class="tour-type">{{ tour.type || "unknown" }}</span>
+      <span class="tour-price">{{ tour.price }}</span>
     </div>
   </div>
 </div>

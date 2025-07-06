@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, BehaviorSubject, combineLatest, throwError } from 'rxjs';
+import { Observable, BehaviorSubject, combineLatest, throwError, of } from 'rxjs';
 import { Tour } from '../models/tour.interface';
 import { TourType } from '../../components/aside/aside.component';
 import { map, tap, catchError } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 export interface TourFilters {
   minPrice?: number;
@@ -13,11 +14,18 @@ export interface TourFilters {
   searchQuery?: string;
 }
 
+export interface Country {
+  flag_url: string;
+  name_ru: string;
+  iso_code2: string;
+  iso_code3: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class ToursService {
-  private apiUrl = 'http://localhost:3000/tours';
+  private apiUrl = environment.apiUrl;
 
   private tourTypeSubject = new BehaviorSubject<TourType>('all');
   tourType$ = this.tourTypeSubject.asObservable();
@@ -49,24 +57,11 @@ export class ToursService {
   }
 
   getTours(): Observable<Tour[]> {
-    return this.http.get<{ tours: any[] }>(this.apiUrl).pipe(
-      map(response => response.tours.map(tour => ({
-        ...tour,
-        // Преобразуем цену в число (убираем символ и запятую)
-        price: typeof tour.price === 'string'
-          ? Number(tour.price.replace(/[^\d.]/g, '').replace(',', '.'))
-          : tour.price ?? 0,
-        // Безопасно подставляем location
-        location: tour.location ?? 'Unknown location',
-        // duration и rating по умолчанию
-        duration: tour.duration ?? 0,
-        rating: tour.rating ?? 0,
-        // Картинка
-        imageUrl: tour.img
-          ? `assets/images/${tour.img}`
-          : 'assets/images/placeholder.svg'
-      })))
-    );
+    return this.http.get<Tour[]>(`${this.apiUrl}/tours`);
+  }
+
+  getCountries(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/countries`);
   }
 
   private validateTourType(type: any): "beach" | "mountain" | "city" | "adventure" | undefined {
@@ -95,10 +90,8 @@ export class ToursService {
     return throwError(() => new Error(`HTTP Error: ${error.status} - ${error.message}`));
   }
 
-  getTourById(id: number): Observable<Tour | undefined> {
-    return this.tours$.pipe(
-      map(tours => tours.find(tour => tour.id === id))
-    );
+  getTourById(id: string): Observable<Tour> {
+    return this.http.get<Tour>(`${this.apiUrl}/tour/${id}`);
   }
 
   getNearestTours(locationId: string): Observable<Tour[]> {
@@ -167,8 +160,8 @@ export class ToursService {
     return this.http.put<Tour>(`${this.apiUrl}/${id}`, tour);
   }
 
-  deleteTour(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  deleteTour(id: string): Observable<Tour[]> {
+    return this.http.delete<Tour[]>(`${this.apiUrl}/tour/${id}`);
   }
 
   updateFilters(filters: Partial<TourFilters>): void {
@@ -179,26 +172,11 @@ export class ToursService {
   getFilteredTours(): Observable<Tour[]> {
     return combineLatest([this.tours$, this.filters$]).pipe(
       map(([tours, filters]) => {
+        const min = filters.minPrice ?? 0;
+        const max = filters.maxPrice ?? Number.MAX_SAFE_INTEGER;
         return tours.filter(tour => {
-          // Фильтр по цене
-          if (filters.minPrice && tour.price < filters.minPrice) return false;
-          if (filters.maxPrice && tour.price > filters.maxPrice) return false;
-          
-          // Фильтр по длительности - конвертируем в число для сравнения
-          if (filters.duration && Number(tour.duration) !== filters.duration) return false;
-          
-          // Фильтр по типу
-          if (filters.type && tour.type !== filters.type) return false;
-          
-          // Фильтр по поисковому запросу
-          if (filters.searchQuery) {
-            const query = filters.searchQuery.toLowerCase();
-            const matchesName = tour.name.toLowerCase().includes(query);
-            const matchesDescription = tour.description.toLowerCase().includes(query);
-            if (!matchesName && !matchesDescription) return false;
-          }
-          
-          return true;
+          const price = Number(tour.price);
+          return !isNaN(price) && price >= min && price <= max;
         });
       })
     );
@@ -216,79 +194,113 @@ export class ToursService {
   getPriceRange(): Observable<{ min: number; max: number }> {
     return this.tours$.pipe(
       map(tours => {
-        if (tours.length === 0) return { min: 0, max: 0 };
-        const prices = tours.map(tour => tour.price);
-        return {
-          min: Math.min(...prices),
-          max: Math.max(...prices)
+        const prices = tours.map(t => Number(t.price)).filter(n => !isNaN(n));
+        const min = prices.length ? Math.min(...prices) : 0;
+        const max = prices.length ? Math.max(...prices) : 0;
+    return {
+          min: min,
+          max: max
         };
       })
     );
   }
 
-  // Временный метод для тестирования с моковыми данными
+  // Моковые данные для тестирования (если API недоступен)
   getMockTours(): Observable<Tour[]> {
     const mockTours: Tour[] = [
       {
-        id: 1,
-        name: "Beach Paradise",
-        description: "Amazing beach vacation in paradise",
-        price: 1200,
-        duration: 7,
-        imageUrl: "assets/images/placeholder.svg",
-        type: "beach",
-        location: "Maldives",
-        rating: 4.5,
-        tourOperator: "Paradise Tours",
-        date: "2024-08-15"
+        id: '1',
+        name: 'Mexico Adventure',
+        description: 'Explore the beautiful landscapes of Mexico',
+        price: '€2,192',
+        type: 'single',
+        date: '2025-03-04T15:30:46.910Z',
+        locationId: '1fe323',
+        img: 'pic1.jpg',
+        tourOperator: 'LocalAdventures',
+        country: 'Мексика'
       },
       {
-        id: 2,
-        name: "Mountain Adventure",
-        description: "Exciting mountain climbing adventure",
-        price: 800,
-        duration: 5,
-        imageUrl: "assets/images/placeholder.svg",
-        type: "adventure",
-        location: "Switzerland",
-        rating: 4.8,
-        tourOperator: "Adventure Co",
-        date: "2024-09-20"
+        id: '2',
+        name: 'Italia, Ocean Cruise',
+        description: 'Discover Pearls of France & Italy',
+        price: '€3,579',
+        type: 'group',
+        date: '2025-03-04T15:30:46.910Z',
+        locationId: '1fe2gfg233',
+        img: 'pic1.jpg',
+        tourOperator: 'Emerald Waterways',
+        country: 'Италия'
       },
       {
-        id: 3,
-        name: "City Explorer",
-        description: "Explore the vibrant city life",
-        price: 600,
-        duration: 3,
-        imageUrl: "assets/images/placeholder.svg",
-        type: "city",
-        location: "Paris",
-        rating: 4.2,
-        tourOperator: "Urban Tours",
-        date: "2024-07-10"
+        id: '3',
+        name: 'Philippines Adventure',
+        description: 'Fantastic tour with a variety of activities',
+        price: '€825',
+        type: 'group',
+        date: '2025-03-04T15:30:46.910Z',
+        locationId: '1fe21233',
+        img: 'pic3.jpg',
+        tourOperator: 'Emerald Waterways',
+        country: 'Филиппины'
       },
       {
-        id: 4,
-        name: "Mountain Retreat",
-        description: "Peaceful mountain getaway",
-        price: 950,
-        duration: 6,
-        imageUrl: "assets/images/placeholder.svg",
-        type: "mountain",
-        location: "Austria",
-        rating: 4.6,
-        tourOperator: "Mountain Escapes",
-        date: "2024-10-05"
+        id: '4',
+        name: 'Japan Discovery',
+        description: 'Tokyo, Hakone, Takayama, Kyoto, Osaka',
+        price: '€1,192',
+        type: 'single',
+        date: '2025-03-05T15:30:46.910Z',
+        locationId: '1fe2g2233',
+        img: 'pic1.jpg',
+        tourOperator: 'LocalAdventures',
+        country: 'Япония'
       }
     ];
+    return of(mockTours);
+  }
 
-    console.log('🎯 Using mock tours:', mockTours);
-    return new Observable(observer => {
-      setTimeout(() => {
-        observer.next(mockTours);
-        observer.complete();
-      }, 500);
-    });
+  getMockCountries(): Observable<any[]> {
+    const mockCountries = [
+      {
+        flag_url: "//upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Flag_of_Mexico.svg/22px-Flag_of_Mexico.svg.png",
+        name_ru: "Мексика",
+        iso_code2: "MX",
+        iso_code3: "MEX"
+      },
+      {
+        flag_url: "//upload.wikimedia.org/wikipedia/commons/thumb/0/03/Flag_of_Italy.svg/22px-Flag_of_Italy.svg.png",
+        name_ru: "Италия",
+        iso_code2: "IT",
+        iso_code3: "ITA"
+      },
+      {
+        flag_url: "//upload.wikimedia.org/wikipedia/commons/thumb/9/99/Flag_of_the_Philippines.svg/22px-Flag_of_the_Philippines.svg.png",
+        name_ru: "Филиппины",
+        iso_code2: "PH",
+        iso_code3: "PHL"
+      },
+      {
+        flag_url: "//upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Flag_of_Japan.svg/22px-Flag_of_Japan.svg.png",
+        name_ru: "Япония",
+        iso_code2: "JP",
+        iso_code3: "JPN"
+      }
+    ];
+    return of(mockCountries);
+  }
+
+  getCountryByCode(code: string): Observable<Country | undefined> {
+    return this.http.get<Country[]>('/api/countries').pipe(
+      map(countries => countries.find(c => c.iso_code2 === code)),
+      catchError(() => of(undefined))
+    );
+  }
+
+  getCountryByLocationId(locationId: string): Observable<Country | undefined> {
+    return this.http.get<Country[]>('/api/countries').pipe(
+      map(countries => countries.find(c => c.iso_code2 === locationId)),
+      catchError(() => of(undefined))
+    );
   }
 }

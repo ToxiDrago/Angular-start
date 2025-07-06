@@ -1,56 +1,161 @@
 <div class="tours-container">
   <div class="tours-header">
     <h1>Available Tours</h1>
-    <p>Discover amazing destinations around the world</p>
+    <div class="filters-section filter-panel">
+      <p-dropdown
+        [options]="tourTypeOptions"
+        [(ngModel)]="selectedType"
+        placeholder="Тип тура"
+        class="filter-dropdown"
+        (onChange)="applyFilters()"
+      ></p-dropdown>
+      <p-calendar
+        [(ngModel)]="selectedDate"
+        dateFormat="yy-mm-dd"
+        placeholder="Дата"
+        class="filter-calendar"
+        (onSelect)="applyFilters()"
+      ></p-calendar>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="searchTerm"
+        (input)="applyFilters()"
+        placeholder="Поиск по названию"
+        class="filter-input"
+      />
+      <div class="filter-slider">
+        <p-slider
+          [(ngModel)]="priceRange"
+          [min]="minPrice"
+          [max]="maxPrice"
+          [range]="true"
+          (onSlideEnd)="applyFilters()"
+          [style.width.px]="150"
+        ></p-slider>
+        <span class="price-label"
+          >{{ priceRange[0] }} - {{ priceRange[1] }} €</span
+        >
+      </div>
+      <button
+        pButton
+        type="button"
+        label="Сбросить фильтры"
+        class="filter-btn"
+        (click)="resetFilters()"
+      ></button>
+    </div>
   </div>
 
-  <div class="tours-grid">
-    @for (tour of tours$ | async; track tour.id) {
-    <div class="tour-card">
-      <div class="tour-image">
-        <img
-          [src]="tour.imageUrl"
-          [alt]="tour.name"
-          (error)="onImageError($event)"
-        />
-      </div>
-      <div class="tour-content">
-        <h3>{{ tour.name }}</h3>
-        <p class="tour-description">{{ tour.description }}</p>
+  <!-- Состояние загрузки -->
+  <div *ngIf="loading" class="p-text-center p-mt-5">
+    <p>Загрузка туров...</p>
+  </div>
 
-        <div class="tour-details">
-          <div class="tour-info">
-            <span class="tour-type">
-              <i class="fas fa-tag"></i>
-              {{ getTourType(tour) }}
-            </span>
-            <span class="tour-duration">
-              <i class="fas fa-clock"></i>
-              {{ tour.duration ? tour.duration + " days" : "N/A" }}
-            </span>
-          </div>
+  <!-- Состояние ошибки -->
+  <div *ngIf="error" class="p-text-center p-mt-5">
+    <p class="p-text-danger">{{ error }}</p>
+  </div>
+
+  <!-- Список туров -->
+  <div *ngIf="!loading && !error" class="tours-list">
+    <div class="tours-grid">
+      <div *ngFor="let tour of filteredTours" class="tour-card">
+        <div class="tour-image">
+          <img [src]="'assets/images/' + tour.img" [alt]="tour.name" />
         </div>
-
-        <div class="tour-footer">
-          <div class="tour-price">
-            <span class="price">{{ formatPrice(tour.price) }}</span>
-            <span class="per-person">per person</span>
+        <div class="tour-content">
+          <h3>{{ tour.name }}</h3>
+          <div class="tour-description scrollable">
+            {{ tour.description }}
           </div>
-
-          <div class="tour-meta">
-            <span class="operator">{{ tour.tourOperator }}</span>
+          <div class="tour-details">
+            <span
+              ><i class="pi pi-calendar"></i>
+              {{ tour.date | date : "dd.MM.yyyy" }}</span
+            >
+            <span class="tour-type"
+              ><i class="pi pi-users"></i> {{ tour.type }}</span
+            >
           </div>
-          <a [routerLink]="['/tour', tour.id]" class="tour-details-link"
-            >Подробнее</a
+          <div
+            *ngIf="getCountryInfo(tour.country) as countryInfo"
+            class="tour-country"
           >
+            <img
+              [src]="countryInfo.flag_url"
+              [alt]="countryInfo.name_ru + ' flag'"
+              width="22"
+              height="16"
+              class="country-flag"
+            />
+            <span class="country-name">Страна: {{ countryInfo.name_ru }}</span>
+          </div>
+          <!-- Футер всегда внизу -->
+          <div class="tour-footer">
+            <span class="tour-price">
+              {{ formatPrice(tour.price) | number : "1.0-0" }}
+              {{ getCurrencySymbol(tour.price) }}
+            </span>
+            <button
+              *ngIf="isAdmin"
+              pButton
+              type="button"
+              icon="pi pi-trash"
+              class="p-button-danger p-button-rounded tour-delete-btn"
+              (click)="confirmDeleteTour(tour)"
+              style="position: absolute; right: 1rem; bottom: 1rem"
+              label="Удалить"
+            ></button>
+            <button
+              pButton
+              type="button"
+              label="Подробнее"
+              class="p-button-rounded p-button-success tour-btn"
+              (click)="openTourDialog(tour)"
+            ></button>
+          </div>
         </div>
       </div>
     </div>
-    } @empty {
-    <div class="no-tours">
-      <p>No tours available at the moment.</p>
-      <p>Please check back later.</p>
-    </div>
-    }
+  </div>
+
+  <div *ngIf="filteredTours.length === 0" class="no-tours">
+    <p>Нет туров, подходящих под выбранные фильтры.</p>
   </div>
 </div>
+
+<p-confirmDialog></p-confirmDialog>
+
+<!-- Модальное окно "Подробнее" -->
+<p-dialog
+  [(visible)]="displayDialog"
+  [modal]="true"
+  [header]="selectedTour?.name"
+  [style]="{ width: '500px' }"
+  (onHide)="selectedTour = null"
+>
+  <ng-container *ngIf="selectedTour">
+    <div class="tour-modal-content">
+      <img
+        [src]="'assets/images/' + selectedTour.img"
+        alt=""
+        class="modal-img"
+      />
+      <div class="modal-info">
+        <div><b>Оператор:</b> {{ selectedTour.tourOperator }}</div>
+        <div><b>Цена:</b> {{ selectedTour.price }}</div>
+        <div><b>Дата:</b> {{ selectedTour.date | date : "dd.MM.yyyy" }}</div>
+        <div><b>Тип:</b> {{ selectedTour.type }}</div>
+        <div><b>Описание:</b> {{ selectedTour.description }}</div>
+      </div>
+      <button
+        pButton
+        type="button"
+        label="В корзину"
+        class="p-button-rounded p-button-primary add-to-basket-btn"
+        (click)="addToBasket(selectedTour)"
+      ></button>
+    </div>
+  </ng-container>
+</p-dialog>
