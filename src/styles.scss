@@ -2,17 +2,27 @@
 @use 'app/styles/mixins' as mixins;
 @use 'app/styles/components';
 
-* {
+// Глобальный сброс и базовые параметры
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body {
   font-family: vars.$font-family-base;
-  margin: 0;
-  padding: 0;
   background-color: vars.$light-gray;
   color: vars.$gray-900;
   line-height: vars.$line-height-normal;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .card {
@@ -158,3 +168,19 @@ body {
 .align-items-center { align-items: center; }
 .gap-2 { gap: 0.5rem; }
 .gap-3 { gap: 1rem; }
+
+// Можно добавить базовые стили для ссылок и выделения текста:
+a {
+  color: vars.$primary-color;
+  text-decoration: none;
+  transition: color 0.2s;
+  &:hover {
+    color: vars.$primary-dark;
+    text-decoration: underline;
+  }
+}
+
+::selection {
+  background: vars.$primary-light;
+  color: #fff;
+}

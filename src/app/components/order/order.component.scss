@@ -1,0 +1,87 @@
+.order-container {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 16px #0001;
+  padding: 2rem;
+  max-width: 600px;
+  margin: 2rem auto;
+}
+
+h2 {
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.order-form .form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+}
+
+.form-field input {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  font-size: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  justify-content: flex-end;
+}
+
+.success-message {
+  color: #2e7d32;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: 0.9rem;
+  margin-top: 0.2rem;
+}
+
+.order-tours-list {
+  margin: 2rem 0 1.5rem 0;
+}
+.order-tours-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.order-tours-list li {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.7rem;
+  font-size: 1.1rem;
+}
+.order-tour-price {
+  margin-left: auto;
+  font-weight: 600;
+  color: #6c63ff;
+}
+.order-total {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 1.2rem;
+  margin-top: 1rem;
+  font-weight: 600;
+}
+.order-success {
+  color: #22bb33;
+  font-size: 1.2rem;
+  margin-top: 1.5rem;
+  text-align: center;
+}

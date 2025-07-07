@@ -1,0 +1,112 @@
+<div class="order-container">
+  <h2>Оформление заказа</h2>
+
+  <div *ngIf="orderSuccess" class="success-message">
+    <p>Заказ успешно оформлен! Перенаправление на страницу туров...</p>
+  </div>
+
+  <form
+    *ngIf="!orderSuccess"
+    [formGroup]="orderForm"
+    (ngSubmit)="submitOrder()"
+    class="order-form"
+  >
+    <div class="form-fields">
+      <ng-template #formField let-field>
+        <div class="form-field">
+          <label [for]="field.name">{{ field.label }}</label>
+
+          <ng-container [ngSwitch]="field.type">
+            <input
+              *ngSwitchCase="'text'"
+              [id]="field.name"
+              [formControlName]="field.name"
+              [type]="getFieldType(field)"
+              pInputText
+              class="w-full"
+              [placeholder]="'Введите ' + field.label.toLowerCase()"
+            />
+
+            <input
+              *ngSwitchCase="'number'"
+              [id]="field.name"
+              [formControlName]="field.name"
+              type="number"
+              pInputText
+              class="w-full"
+              [placeholder]="'Введите ' + field.label.toLowerCase()"
+            />
+
+            <input
+              *ngSwitchCase="'date'"
+              [id]="field.name"
+              [formControlName]="field.name"
+              type="date"
+              pInputText
+              class="w-full"
+            />
+
+            <input
+              *ngSwitchCase="'email'"
+              [id]="field.name"
+              [formControlName]="field.name"
+              type="email"
+              pInputText
+              class="w-full"
+              placeholder="Введите email"
+            />
+
+            <input
+              *ngSwitchCase="'tel'"
+              [id]="field.name"
+              [formControlName]="field.name"
+              type="tel"
+              pInputText
+              class="w-full"
+              placeholder="Введите номер телефона"
+            />
+          </ng-container>
+
+          <div
+            *ngIf="
+              orderForm.get(field.name)?.invalid &&
+              orderForm.get(field.name)?.touched
+            "
+            class="error-message"
+          >
+            <span *ngIf="orderForm.get(field.name)?.errors?.['required']"
+              >Это поле обязательно для заполнения</span
+            >
+            <span *ngIf="orderForm.get(field.name)?.errors?.['email']"
+              >Введите корректный email</span
+            >
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-container *ngFor="let field of userFormFieldsArr">
+        <ng-container
+          *ngTemplateOutlet="formField; context: { $implicit: field }"
+        ></ng-container>
+      </ng-container>
+    </div>
+
+    <div class="form-actions">
+      <button
+        pButton
+        type="button"
+        label="Отмена"
+        class="p-button-secondary"
+        (click)="router.navigate(['/basket'])"
+      ></button>
+
+      <button
+        pButton
+        type="submit"
+        label="Оформить заказ"
+        class="p-button-success"
+        [disabled]="orderForm.invalid"
+      ></button>
+    </div>
+  </form>
+</div>

@@ -1,49 +1,70 @@
 <div class="tours-container">
   <div class="tours-header">
     <h1>Available Tours</h1>
-    <div class="filters-section filter-panel">
-      <p-dropdown
-        [options]="tourTypeOptions"
-        [(ngModel)]="selectedType"
-        placeholder="Тип тура"
-        class="filter-dropdown"
-        (onChange)="applyFilters()"
-      ></p-dropdown>
-      <p-calendar
-        [(ngModel)]="selectedDate"
-        dateFormat="yy-mm-dd"
-        placeholder="Дата"
-        class="filter-calendar"
-        (onSelect)="applyFilters()"
-      ></p-calendar>
-      <input
-        type="text"
-        pInputText
-        [(ngModel)]="searchTerm"
-        (input)="applyFilters()"
-        placeholder="Поиск по названию"
-        class="filter-input"
-      />
-      <div class="filter-slider">
-        <p-slider
-          [(ngModel)]="priceRange"
-          [min]="minPrice"
-          [max]="maxPrice"
-          [range]="true"
-          (onSlideEnd)="applyFilters()"
-          [style.width.px]="150"
-        ></p-slider>
-        <span class="price-label"
-          >{{ priceRange[0] }} - {{ priceRange[1] }} €</span
+    <div class="filters-panel">
+      <div class="filters-row">
+        <p-select
+          [options]="typeOptions"
+          [formControl]="typeControl"
+          placeholder="Все типы"
+          class="filter-dropdown custom-dropdown"
+        ></p-select>
+
+        <p-datepicker
+          [formControl]="dateControl"
+          class="filter-date"
+          placeholder="Дата"
+          inputId="tourDateFilter"
+          showIcon="true"
+          dateFormat="dd.mm.yy"
+        ></p-datepicker>
+
+        <input
+          type="text"
+          [formControl]="searchControl"
+          class="filter-search"
+          placeholder="Поиск по названию"
+        />
+
+        <div class="filter-slider">
+          <p-slider
+            [formControl]="priceRangeControl"
+            [min]="minPrice"
+            [max]="maxPrice"
+            [range]="true"
+            styleClass="price-slider"
+          ></p-slider>
+          <span class="price-range-label">
+            {{
+              priceRangeControl.value ? priceRangeControl.value[0] : minPrice
+            }}
+            € -
+            {{
+              priceRangeControl.value ? priceRangeControl.value[1] : maxPrice
+            }}
+            €
+          </span>
+        </div>
+
+        <button
+          pButton
+          type="button"
+          class="reset-btn"
+          (click)="resetFilters()"
+          *ngIf="hasActiveFilters()"
         >
+          Сбросить фильтры
+        </button>
       </div>
-      <button
-        pButton
-        type="button"
-        label="Сбросить фильтры"
-        class="filter-btn"
-        (click)="resetFilters()"
-      ></button>
+
+      <div class="filters-row basket-checkbox-row">
+        <p-checkbox
+          [formControl]="showOnlyBasketControl"
+          binary="true"
+          inputId="showOnlyBasket"
+        ></p-checkbox>
+        <label for="showOnlyBasket">Показывать только туры из корзины</label>
+      </div>
     </div>
   </div>
 

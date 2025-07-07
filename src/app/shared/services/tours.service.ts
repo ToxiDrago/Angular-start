@@ -57,7 +57,9 @@ export class ToursService {
   }
 
   getTours(): Observable<Tour[]> {
-    return this.http.get<Tour[]>(`${this.apiUrl}/tours`);
+    return this.http.get<{ tours: Tour[] }>(this.apiUrl + '/tours').pipe(
+      map(response => response.tours)
+    );
   }
 
   getCountries(): Observable<any[]> {

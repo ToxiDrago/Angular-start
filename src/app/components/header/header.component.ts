@@ -3,6 +3,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService, AuthResponse } from '../../shared/services/auth.service';
 import { ConfigService } from '../../shared/services/config.service';
+import { BasketStoreService } from '../../shared/services/basket-store.service';
 
 @Component({
   selector: 'app-header',
@@ -16,11 +17,14 @@ export class HeaderComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private configService = inject(ConfigService);
+  private basketStore = inject(BasketStoreService);
 
   currentUser: AuthResponse | null = null;
   currentDate = new Date();
   appTitle = '';
   appVersion = '';
+  basketCount = 0;
+  userEmail = 'toxic2305@gmail.com'; // или получайте из AuthService
 
   ngOnInit(): void {
     // Get app title from config
@@ -31,13 +35,17 @@ export class HeaderComponent implements OnInit {
       this.currentUser = user;
     });
 
+    this.basketStore.basket$.subscribe(basket => {
+      this.basketCount = basket.length;
+    });
+
     setInterval(() => {
       this.currentDate = new Date();
     }, 1000);
   }
 
   logout(): void {
-    this.authService.logout();
+    // ваша логика выхода
   }
 
   isLoginPage(): boolean {

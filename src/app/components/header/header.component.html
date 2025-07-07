@@ -1,87 +1,51 @@
 <header class="header">
-  <div class="container">
-    <div class="header-content">
-      <div class="header-brand">
-        <h1 class="brand-title" [title]="getAppInfo()">{{ appTitle }}</h1>
-        <div class="header-date">
-          <span class="date-time">
-            {{ currentDate | date : "medium" }}
-          </span>
-          <br />
-          <small class="date-short">
-            {{ currentDate | date : "shortDate" }}
-          </small>
-        </div>
-        <small class="app-version">v{{ appVersion }}</small>
+  <div class="header-left">
+    <div class="header-title">
+      <div class="app-title">Tour Management System</div>
+      <div class="app-date">
+        {{ currentDate | date : "d MMMM y г., HH:mm:ss" }}
       </div>
-
-      <nav class="header-nav" *ngIf="!isLoginPage()">
-        <ul class="nav-menu">
-          <li class="nav-item">
-            <a
-              routerLink="/dashboard"
-              routerLinkActive="active"
-              class="nav-link"
-            >
-              <i class="pi pi-home"></i>
-              Главная
-            </a>
-          </li>
-          <li class="nav-item">
-            <a routerLink="/tours" routerLinkActive="active" class="nav-link">
-              <i class="pi pi-map"></i>
-              Туры
-            </a>
-          </li>
-          <li class="nav-item">
-            <a routerLink="/tickets" routerLinkActive="active" class="nav-link">
-              <i class="pi pi-ticket"></i>
-              Билеты
-            </a>
-          </li>
-        </ul>
-      </nav>
-
-      <nav class="header-nav" *ngIf="isLoginPage()">
-        <ul class="nav-menu">
-          <li class="nav-item">
-            <a
-              routerLink="/settings"
-              routerLinkActive="active"
-              class="nav-link"
-            >
-              <i class="pi pi-cog"></i>
-              Настройки
-            </a>
-          </li>
-          <li class="nav-item">
-            <a
-              routerLink="/registration"
-              routerLinkActive="active"
-              class="nav-link"
-            >
-              <i class="pi pi-user-plus"></i>
-              Регистрация
-            </a>
-          </li>
-        </ul>
-      </nav>
-
-      <div class="header-user" *ngIf="currentUser">
-        <div class="user-info">
-          <span class="user-name">
-            <i class="pi pi-user"></i>
-            {{ currentUser.login }}
-          </span>
-          <span class="user-email" *ngIf="currentUser.email">
-            {{ currentUser.email }}
-          </span>
-        </div>
-        <button class="logout-btn" (click)="logout()">
-          <i class="pi pi-sign-out"></i>
-          Выйти
-        </button>
+      <div class="app-version">v1.0.0</div>
+    </div>
+  </div>
+  <nav class="header-nav">
+    <a
+      routerLink="/"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      >Главная</a
+    >
+    <a routerLink="/tours" routerLinkActive="active">Туры</a>
+    <a routerLink="/tickets" routerLinkActive="active">Билеты</a>
+  </nav>
+  <div class="header-actions">
+    <a routerLink="/basket" class="basket-link" title="Корзина">
+      <div class="svg-basket-wrapper">
+        <svg
+          class="svg-basket"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 256 256"
+        >
+          <rect fill="none" height="256" width="256" />
+          <circle cx="80" cy="216" r="12" />
+          <circle cx="184" cy="216" r="12" />
+          <path
+            d="M42.3,72H221.7l-26.4,92.4A15.9,15.9,0,0,1,179.9,176H84.1a15.9,15.9,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H8"
+            fill="none"
+            stroke="#6c63ff"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="8"
+          />
+        </svg>
+        <span class="svg-basket-count" *ngIf="basketCount > 0">{{
+          basketCount
+        }}</span>
       </div>
+    </a>
+    <div class="header-user">
+      <span class="user-email">{{ userEmail }}</span>
+      <button class="logout-btn" (click)="logout()">Выйти</button>
     </div>
   </div>
 </header>

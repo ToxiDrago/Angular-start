@@ -1,17 +1,18 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Subject, takeUntil, forkJoin, of } from 'rxjs';
 import { ToursService } from '../../shared/services/tours.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { Tour } from '../../shared/models/tour.interface';
-import { DropdownModule } from 'primeng/dropdown';
-import { CalendarModule } from 'primeng/calendar';
+import { SelectModule } from 'primeng/select';
+import { DatePickerModule } from 'primeng/datepicker';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { SliderModule } from 'primeng/slider';
 import { ButtonModule } from 'primeng/button';
+import { CheckboxModule } from 'primeng/checkbox';
 import { ConfirmationService } from 'primeng/api';
 import { catchError } from 'rxjs/operators';
 import { Country } from '../../shared/services/tours.service';
@@ -31,12 +32,14 @@ import { BasketStoreService } from '../../shared/services/basket-store.service';
     CommonModule,
     RouterModule,
     FormsModule,
-    DropdownModule,
-    CalendarModule,
+    ReactiveFormsModule,
+    SelectModule,
+    DatePickerModule,
     CardModule,
     InputTextModule,
     SliderModule,
     ButtonModule,
+    CheckboxModule,
     DialogModule,
     ConfirmDialogModule,
     ToastModule,
@@ -52,29 +55,29 @@ export class ToursComponent implements OnInit, OnDestroy {
   allTours: Tour[] = [];
   filteredTours: Tour[] = [];
   tourTypes: { label: string, value: string }[] = [];
-  selectedType: string = '';
-  selectedDate: Date | null = null;
-  searchTerm: string = '';
-  minPrice: number = 0;
-  maxPrice: number = 10000;
-  priceRange: [number, number] = [0, 10000];
-  
-  // Добавляем недостающие свойства
-  loading = false;
-  error: string | null = null;
+  minPrice = 680;
+  maxPrice = 3579;
+  loading: boolean = false;
+  error: boolean = false;
   isAdmin = false;
 
-  tourTypeOptions = [
-    { label: 'Все типы', value: '' },
-    { label: 'Одиночный', value: 'single' },
-    { label: 'Групповой', value: 'group' }
+  typeOptions = [
+    { label: 'Все типы', value: null },
+    { label: 'Групповой', value: 'group' },
+    { label: 'Индивидуальный', value: 'single' }
   ];
+
+  // Реактивные формы для фильтров
+  typeControl = new FormControl(null);
+  dateControl = new FormControl('');
+  searchControl = new FormControl('');
+  priceRangeControl = new FormControl([this.minPrice, this.maxPrice]);
+  showOnlyBasketControl = new FormControl(false);
 
   currentPage = 1;
   pageSize = 10;
   totalTours = 0;
   filteredCount = 0;
-  
   private destroy$ = new Subject<void>();
 
   // Для модального окна
@@ -92,6 +95,8 @@ export class ToursComponent implements OnInit, OnDestroy {
     // ... остальные id и коды стран
   };
 
+  private priceSliderTouched = false;
+
   constructor(
     private toursService: ToursService,
     private notificationService: NotificationService,
@@ -99,15 +104,29 @@ export class ToursComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private authService: AuthService,
     private basketStore: BasketStoreService
-  ) {}
+  ) {
+    this.basketStore.basket$.subscribe(() => {
+      this.applyFilters();
+    });
+  }
 
   ngOnInit(): void {
     this.loadTours();
     this.loadCountries();
     this.resetFilters();
-    // Определяем, админ ли пользователь (например, по логину)
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     this.isAdmin = user?.login === 'admin';
+
+    this.typeControl.valueChanges.subscribe(() => this.applyFilters());
+    this.dateControl.valueChanges.subscribe(() => this.applyFilters());
+    this.searchControl.valueChanges.subscribe(() => this.applyFilters());
+    this.priceRangeControl.valueChanges.subscribe(() => {
+      this.priceSliderTouched = true;
+      this.applyFilters();
+    });
+    this.showOnlyBasketControl.valueChanges.subscribe(() => {
+      this.applyFilters();
+    });
   }
 
   ngOnDestroy(): void {
@@ -117,49 +136,56 @@ export class ToursComponent implements OnInit, OnDestroy {
 
   loadTours(): void {
     this.loading = true;
-    this.error = null;
-    
+    this.error = false;
     this.toursService.getTours().subscribe({
-      next: (tours: Tour[]) => {
-        this.allTours = tours;
-        const prices = tours.map(t => this.formatPrice(t.price));
+      next: (data: any) => {
+        this.allTours = Array.isArray(data) ? data : data.tours;
+        this.filteredTours = [...this.allTours];
+        const prices = this.allTours.map(t => this.formatPrice(t.price));
         this.minPrice = Math.min(...prices);
         this.maxPrice = Math.max(...prices);
-        this.priceRange = [this.minPrice, this.maxPrice];
+        this.priceRangeControl.setValue([this.minPrice, this.maxPrice]);
         this.resetFilters();
-        this.totalTours = tours.length;
-        this.filteredCount = tours.length;
+        this.totalTours = this.allTours.length;
+        this.filteredCount = this.allTours.length;
         this.loading = false;
       },
-      error: (err) => {
-        console.error('Ошибка загрузки туров:', err);
-        this.error = 'Ошибка загрузки туров';
+      error: () => {
+        this.error = true;
         this.loading = false;
-        this.notificationService.showError('Ошибка загрузки туров');
       }
     });
   }
 
   applyFilters(): void {
+    const selectedType = this.typeControl.value;
+    const selectedDate = this.dateControl.value;
+    const searchTerm = this.searchControl.value;
+    const priceRange = this.priceRangeControl.value;
+    const showOnlyBasket = this.showOnlyBasketControl.value;
     this.filteredTours = this.allTours.filter(tour => {
-      const matchesType = this.selectedType ? tour.type === this.selectedType : true;
-      const matchesDate = this.selectedDate
-        ? (tour.date && tour.date.slice(0, 10) === this.selectedDate?.toISOString().slice(0, 10))
+      const price = parseInt(tour.price.replace(/[^\d]/g, ''), 10);
+      const inBasket = this.isInBasket(tour);
+      const priceFilter = this.priceSliderTouched
+        ? (Array.isArray(priceRange) && priceRange.length === 2 && price >= priceRange[0] && price <= priceRange[1])
         : true;
-      const matchesName = this.searchTerm
-        ? tour.name.toLowerCase().includes(this.searchTerm.toLowerCase())
-        : true;
-      const price = this.formatPrice(tour.price);
-      const matchesPrice = price >= this.priceRange[0] && price <= this.priceRange[1];
-      return matchesType && matchesDate && matchesName && matchesPrice;
+      return (
+        (!selectedType || tour.type === selectedType) &&
+        (!selectedDate || tour.date.startsWith(selectedDate)) &&
+        (!searchTerm || tour.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        priceFilter &&
+        (!showOnlyBasket || inBasket)
+      );
     });
   }
 
   resetFilters(): void {
-    this.selectedType = '';
-    this.selectedDate = null;
-    this.searchTerm = '';
-    this.priceRange = [this.minPrice, this.maxPrice];
+    this.typeControl.setValue(null);
+    this.dateControl.setValue('');
+    this.searchControl.setValue('');
+    this.priceRangeControl.setValue([this.minPrice, this.maxPrice]);
+    this.showOnlyBasketControl.setValue(false);
+    this.priceSliderTouched = false;
     this.applyFilters();
   }
 
@@ -195,11 +221,15 @@ export class ToursComponent implements OnInit, OnDestroy {
   }
 
   hasActiveFilters(): boolean {
-    return this.searchTerm.trim() !== '' || 
-           this.selectedType !== '' || 
-           this.selectedDate !== null ||
-           this.priceRange[0] !== this.minPrice ||
-           this.priceRange[1] !== this.maxPrice;
+    const priceRange = this.priceRangeControl.value;
+    return (this.searchControl.value?.trim() !== '' || 
+      this.typeControl.value !== null || 
+      this.dateControl.value !== '' ||
+      this.showOnlyBasketControl.value === true ||
+      (Array.isArray(priceRange) && (
+        priceRange[0] !== this.minPrice ||
+        priceRange[1] !== this.maxPrice
+      )));
   }
 
   hasResults(): boolean {
@@ -324,5 +354,9 @@ export class ToursComponent implements OnInit, OnDestroy {
 
   getCountryInfo(countryName: string): Country | null {
     return this.countries.find(c => c.name_ru === countryName) || null;
+  }
+
+  isInBasket(tour: Tour): boolean {
+    return this.basketStore.basket.some((t: Tour) => t.id === tour.id);
   }
 }
