@@ -11,7 +11,7 @@ import { BasketStoreService } from '../../shared/services/basket-store.service';
   imports: [CommonModule, RouterLink, RouterLinkActive, DatePipe],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
-  encapsulation: ViewEncapsulation.Emulated
+  encapsulation: ViewEncapsulation.Emulated,
 })
 export class HeaderComponent implements OnInit {
   private authService = inject(AuthService);
@@ -31,11 +31,11 @@ export class HeaderComponent implements OnInit {
     this.appTitle = this.configService.get('appTitle');
     this.appVersion = this.configService.get('version');
 
-    this.authService.currentUser$.subscribe(user => {
+    this.authService.currentUser$.subscribe((user) => {
       this.currentUser = user;
     });
 
-    this.basketStore.basket$.subscribe(basket => {
+    this.basketStore.basket$.subscribe((basket) => {
       this.basketCount = basket.length;
     });
 
@@ -45,7 +45,7 @@ export class HeaderComponent implements OnInit {
   }
 
   logout(): void {
-    // ваша логика выхода
+    this.authService.logout();
   }
 
   isLoginPage(): boolean {

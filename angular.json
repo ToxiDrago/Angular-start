@@ -33,8 +33,6 @@
               "src/assets"
             ],
             "styles": [
-              "node_modules/@primeng/themes/lara/lara-light-blue/theme.css",
-              "node_modules/primeng/resources/primeng.min.css",
               "node_modules/primeicons/primeicons.css",
               "src/styles.scss"
             ],
@@ -120,5 +118,10 @@
   },
   "cli": {
     "analytics": false
+  },
+  "schematics": {
+    "@schematics/angular:component": {
+      "style": "scss"
+    }
   }
 }

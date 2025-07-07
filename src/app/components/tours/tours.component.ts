@@ -45,16 +45,16 @@ import { BasketStoreService } from '../../shared/services/basket-store.service';
     ToastModule,
     NgIf,
     NgFor,
-    ProgressSpinnerModule
+    ProgressSpinnerModule,
   ],
   providers: [ConfirmationService],
   templateUrl: './tours.component.html',
-  styleUrls: ['./tours.component.scss']
+  styleUrls: ['./tours.component.scss'],
 })
 export class ToursComponent implements OnInit, OnDestroy {
   allTours: Tour[] = [];
   filteredTours: Tour[] = [];
-  tourTypes: { label: string, value: string }[] = [];
+  tourTypes: { label: string; value: string }[] = [];
   minPrice = 680;
   maxPrice = 3579;
   loading: boolean = false;
@@ -64,7 +64,7 @@ export class ToursComponent implements OnInit, OnDestroy {
   typeOptions = [
     { label: 'Все типы', value: null },
     { label: 'Групповой', value: 'group' },
-    { label: 'Индивидуальный', value: 'single' }
+    { label: 'Индивидуальный', value: 'single' },
   ];
 
   // Реактивные формы для фильтров
@@ -90,8 +90,8 @@ export class ToursComponent implements OnInit, OnDestroy {
 
   // Сопоставление locationId → iso_code2
   private locationIdToCountryCode: { [key: string]: string } = {
-    '1fe323': 'MX',      // Mexico
-    '1fe2fg233': 'IT',   // Italia
+    '1fe323': 'MX', // Mexico
+    '1fe2fg233': 'IT', // Italia
     // ... остальные id и коды стран
   };
 
@@ -141,7 +141,7 @@ export class ToursComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.allTours = Array.isArray(data) ? data : data.tours;
         this.filteredTours = [...this.allTours];
-        const prices = this.allTours.map(t => this.formatPrice(t.price));
+        const prices = this.allTours.map((t) => this.formatPrice(t.price));
         this.minPrice = Math.min(...prices);
         this.maxPrice = Math.max(...prices);
         this.priceRangeControl.setValue([this.minPrice, this.maxPrice]);
@@ -153,7 +153,7 @@ export class ToursComponent implements OnInit, OnDestroy {
       error: () => {
         this.error = true;
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -163,16 +163,20 @@ export class ToursComponent implements OnInit, OnDestroy {
     const searchTerm = this.searchControl.value;
     const priceRange = this.priceRangeControl.value;
     const showOnlyBasket = this.showOnlyBasketControl.value;
-    this.filteredTours = this.allTours.filter(tour => {
+    this.filteredTours = this.allTours.filter((tour) => {
       const price = parseInt(tour.price.replace(/[^\d]/g, ''), 10);
       const inBasket = this.isInBasket(tour);
       const priceFilter = this.priceSliderTouched
-        ? (Array.isArray(priceRange) && priceRange.length === 2 && price >= priceRange[0] && price <= priceRange[1])
+        ? Array.isArray(priceRange) &&
+          priceRange.length === 2 &&
+          price >= priceRange[0] &&
+          price <= priceRange[1]
         : true;
       return (
         (!selectedType || tour.type === selectedType) &&
         (!selectedDate || tour.date.startsWith(selectedDate)) &&
-        (!searchTerm || tour.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (!searchTerm ||
+          tour.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
         priceFilter &&
         (!showOnlyBasket || inBasket)
       );
@@ -222,14 +226,14 @@ export class ToursComponent implements OnInit, OnDestroy {
 
   hasActiveFilters(): boolean {
     const priceRange = this.priceRangeControl.value;
-    return (this.searchControl.value?.trim() !== '' || 
-      this.typeControl.value !== null || 
+    return (
+      this.searchControl.value?.trim() !== '' ||
+      this.typeControl.value !== null ||
       this.dateControl.value !== '' ||
       this.showOnlyBasketControl.value === true ||
-      (Array.isArray(priceRange) && (
-        priceRange[0] !== this.minPrice ||
-        priceRange[1] !== this.maxPrice
-      )));
+      (Array.isArray(priceRange) &&
+        (priceRange[0] !== this.minPrice || priceRange[1] !== this.maxPrice))
+    );
   }
 
   hasResults(): boolean {
@@ -254,10 +258,10 @@ export class ToursComponent implements OnInit, OnDestroy {
 
   getTourTypeLabel(type: string): string {
     const typeLabels: { [key: string]: string } = {
-      'beach': 'Пляжный отдых',
-      'mountain': 'Горный туризм',
-      'city': 'Городские туры',
-      'adventure': 'Приключения'
+      beach: 'Пляжный отдых',
+      mountain: 'Горный туризм',
+      city: 'Городские туры',
+      adventure: 'Приключения',
     };
     return typeLabels[type] || type;
   }
@@ -282,7 +286,7 @@ export class ToursComponent implements OnInit, OnDestroy {
       : date.toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
-          day: 'numeric'
+          day: 'numeric',
         });
   }
 
@@ -305,7 +309,7 @@ export class ToursComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         // обработка ошибки
-      }
+      },
     });
   }
 
@@ -323,7 +327,7 @@ export class ToursComponent implements OnInit, OnDestroy {
     const code = this.locationIdToCountryCode[locationId];
     if (!code) return undefined;
     return this.countries.find(
-      c => c.iso_code2 === code || c.iso_code3 === code
+      (c) => c.iso_code2 === code || c.iso_code3 === code
     );
   }
 
@@ -331,7 +335,9 @@ export class ToursComponent implements OnInit, OnDestroy {
     if (!tourName) return undefined;
     // Сравниваем без учёта регистра и пробелов
     return this.countries.find(
-      c => c.name_ru && tourName.trim().toLowerCase() === c.name_ru.trim().toLowerCase()
+      (c) =>
+        c.name_ru &&
+        tourName.trim().toLowerCase() === c.name_ru.trim().toLowerCase()
     );
   }
 
@@ -346,17 +352,39 @@ export class ToursComponent implements OnInit, OnDestroy {
         this.toursService.getMockCountries().subscribe({
           next: (mockCountries) => {
             this.countries = mockCountries;
-          }
+          },
         });
-      }
+      },
     });
   }
 
   getCountryInfo(countryName: string): Country | null {
-    return this.countries.find(c => c.name_ru === countryName) || null;
+    return this.countries.find((c) => c.name_ru === countryName) || null;
   }
 
   isInBasket(tour: Tour): boolean {
     return this.basketStore.basket.some((t: Tour) => t.id === tour.id);
+  }
+
+  onMinPriceInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const min = Number(input.value);
+    const max = this.priceRangeControl.value
+      ? this.priceRangeControl.value[1]
+      : this.maxPrice;
+    if (!isNaN(min) && min <= max) {
+      this.priceRangeControl.setValue([min, max]);
+    }
+  }
+
+  onMaxPriceInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const max = Number(input.value);
+    const min = this.priceRangeControl.value
+      ? this.priceRangeControl.value[0]
+      : this.minPrice;
+    if (!isNaN(max) && max >= min) {
+      this.priceRangeControl.setValue([min, max]);
+    }
   }
 }

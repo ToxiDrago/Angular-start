@@ -727,21 +727,50 @@
   font-size: 1rem;
 }
 
-// Удаляем или комментируем кастомные стили для PrimeNG чекбокса и ползунка:
-/*
-::ng-deep .p-checkbox-box {
-  border-radius: 6px;
-  border: 1.5px solid #6c63ff;
-}
-::ng-deep .p-checkbox-box.p-highlight {
-  background: #6c63ff;
-  border-color: #6c63ff;
-}
-::ng-deep .p-checkbox-icon {
-  color: #fff;
-}
+// Стилизация ползунка PrimeNG Slider для фильтра цены
 ::ng-deep .price-slider .p-slider {
-  width: 120px !important;
+  background: #fff !important;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(60, 60, 120, 0.07);
+  padding: 0.5rem 1rem;
+  min-width: 160px;
+  height: 2.2rem;
+}
+::ng-deep .price-slider .p-slider-range {
+  background: #6c63ff !important;
+  border-radius: 8px;
+}
+::ng-deep .price-slider .p-slider-handle {
+  background: #fff !important;
+  border: 2px solid #6c63ff !important;
+  box-shadow: 0 2px 8px rgba(60, 60, 120, 0.10);
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: -0.4rem;
+}
+::ng-deep .price-slider .p-slider-handle:focus {
+  outline: none;
+  border-color: #a084ee !important;
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
+}
+::ng-deep .price-slider .p-slider .p-slider-range {
+  background: #6c63ff !important;
+}
+
+.price-input {
+  width: 70px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  padding: 0.4rem 0.7rem;
+  background: #fff;
+  font-size: 1rem;
+  color: #333;
+  text-align: center;
+  margin: 0 0.3rem;
+}
+.min-price-input {
   margin-right: 0.5rem;
 }
-*/
+.max-price-input {
+  margin-left: 0.5rem;
+}

@@ -27,6 +27,18 @@
         />
 
         <div class="filter-slider">
+          <input
+            type="number"
+            class="price-input min-price-input"
+            [min]="minPrice"
+            [max]="
+              priceRangeControl.value ? priceRangeControl.value[1] : maxPrice
+            "
+            [value]="
+              priceRangeControl.value ? priceRangeControl.value[0] : minPrice
+            "
+            (input)="onMinPriceInput($event)"
+          />
           <p-slider
             [formControl]="priceRangeControl"
             [min]="minPrice"
@@ -34,6 +46,18 @@
             [range]="true"
             styleClass="price-slider"
           ></p-slider>
+          <input
+            type="number"
+            class="price-input max-price-input"
+            [min]="
+              priceRangeControl.value ? priceRangeControl.value[0] : minPrice
+            "
+            [max]="maxPrice"
+            [value]="
+              priceRangeControl.value ? priceRangeControl.value[1] : maxPrice
+            "
+            (input)="onMaxPriceInput($event)"
+          />
           <span class="price-range-label">
             {{
               priceRangeControl.value ? priceRangeControl.value[0] : minPrice
